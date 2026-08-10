@@ -1,5 +1,6 @@
 package com.mxis.server.auth.controller;
 
+import com.mxis.server.auth.dto.KakaoLoginRequest;
 import com.mxis.server.auth.dto.LoginRequest;
 import com.mxis.server.auth.dto.RefreshRequest;
 import com.mxis.server.auth.dto.SignupRequest;
@@ -43,6 +44,12 @@ public class AuthController {
     @PostMapping("/refresh")
     public ApiResponse<TokenResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ApiResponse.ok(authService.refresh(request));
+    }
+
+    @SecurityRequirements
+    @PostMapping("/kakao/login")
+    public ApiResponse<TokenResponse> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        return ApiResponse.ok(authService.kakaoLogin(request));
     }
 
     @PostMapping("/logout")

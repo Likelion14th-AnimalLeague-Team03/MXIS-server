@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.040s</div>
+<div class="counter">0.031s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,37 +79,37 @@
 </thead>
 <tr>
 <td class="success">getConsents_success_returnsList()</td>
-<td class="success">0.006s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">getMe_success_returnsUser()</td>
-<td class="success">0.004s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">getMe_withoutToken_returns401()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">getNotificationSettings_success()</td>
 <td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
+<td class="success">getMe_withoutToken_returns401()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">getNotificationSettings_success()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
 <td class="success">updateConsents_emptyList_returns400()</td>
-<td class="success">0.016s</td>
+<td class="success">0.013s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">updateConsents_success_returnsUpdatedList()</td>
-<td class="success">0.006s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">updateNotificationSettings_success()</td>
-<td class="success">0.004s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -117,8 +117,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-10T10:27:47.731+09:00  INFO 50377 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-10T10:27:47.737+09:00  INFO 50377 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
+<pre>2026-08-10T17:11:13.100+09:00  INFO 51250 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T17:11:13.105+09:00  INFO 51250 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -129,21 +129,21 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-10T10:27:47.745+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 50377 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-10T10:27:47.745+09:00 DEBUG 50377 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-10T10:27:47.745+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
-2026-08-10T10:27:47.853+09:00  WARN 50377 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-10T17:11:13.116+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 51250 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-10T17:11:13.116+09:00 DEBUG 51250 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-10T17:11:13.116+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
+2026-08-10T17:11:13.204+09:00  WARN 51250 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: a08bcba9-6044-4e04-96ce-5a58efd7b169
+Using generated security password: f7e41ed2-70e7-407a-b09b-130f7f4a9088
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-10T10:27:47.854+09:00  INFO 50377 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-10T10:27:47.882+09:00 DEBUG 50377 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-10T10:27:47.882+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-10T10:27:47.882+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-10T10:27:47.882+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-10T10:27:47.885+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.147 seconds (process running for 2.428)
+2026-08-10T17:11:13.204+09:00  INFO 51250 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-10T17:11:13.224+09:00 DEBUG 51250 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-10T17:11:13.224+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-10T17:11:13.224+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-10T17:11:13.224+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-10T17:11:13.226+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.12 seconds (process running for 2.35)
 </pre>
 </span>
 </div>
@@ -155,7 +155,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 10. 오전 10:27:47</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 10. 오후 5:11:13</p>
 </div>
 </div>
 </body>

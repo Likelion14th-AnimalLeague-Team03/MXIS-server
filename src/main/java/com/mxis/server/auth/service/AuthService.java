@@ -1,10 +1,14 @@
 package com.mxis.server.auth.service;
 
+import com.mxis.server.auth.client.KakaoApiClient;
+import com.mxis.server.auth.client.KakaoUserInfo;
+import com.mxis.server.auth.dto.KakaoLoginRequest;
 import com.mxis.server.auth.dto.LoginRequest;
 import com.mxis.server.auth.dto.RefreshRequest;
 import com.mxis.server.auth.dto.SignupRequest;
 import com.mxis.server.auth.dto.SignupResponse;
 import com.mxis.server.auth.dto.TokenResponse;
+import com.mxis.server.common.enums.AuthProvider;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.common.security.JwtTokenProvider;
@@ -28,6 +32,7 @@ public class AuthService {
     private final NotificationSettingRepository notificationSettingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final KakaoApiClient kakaoApiClient;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
@@ -58,6 +63,40 @@ public class AuthService {
         }
 
         return issueTokens(user);
+    }
+
+    /**
+     * 클라이언트(앱)가 카카오 SDK로 로그인해 발급받은 access token을 그대로 넘겨받아 검증한다.
+     * (provider, provider_uid) 조합으로 기존 회원을 찾고, 없으면 최초 로그인으로 간주해 자동 가입시킨다.
+     */
+    @Transactional
+    public TokenResponse kakaoLogin(KakaoLoginRequest request) {
+        KakaoUserInfo kakaoUser = kakaoApiClient.getUserInfo(request.accessToken());
+        String providerUid = String.valueOf(kakaoUser.id());
+
+        User user = userRepository.findActiveByProviderAndProviderUid(AuthProvider.KAKAO, providerUid)
+                .orElseGet(() -> registerKakaoUser(kakaoUser, providerUid));
+
+        return issueTokens(user);
+    }
+
+    private User registerKakaoUser(KakaoUserInfo kakaoUser, String providerUid) {
+        // 카카오 계정에 이메일 동의를 하지 않은 사용자는 email이 없을 수 있다.
+        // users.email은 NOT NULL + UNIQUE라 실제 이메일과 절대 충돌하지 않는 합성 이메일로 대체한다.
+        String email = kakaoUser.email() != null ? kakaoUser.email() : "kakao_" + providerUid + "@kakao.mxis.local";
+
+        if (userRepository.existsByEmailAndDeletedAtIsNull(email)) {
+            throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS, "이미 다른 방식으로 가입된 이메일입니다.");
+        }
+
+        String name = kakaoUser.nickname() != null ? kakaoUser.nickname() : "카카오 사용자";
+        User user = User.createSocial(email, AuthProvider.KAKAO, providerUid, name);
+        userRepository.save(user);
+
+        // 회원가입 시 알림 설정 기본값 1행을 함께 생성한다 (notification_settings: user_id unique).
+        notificationSettingRepository.save(new NotificationSetting(user));
+
+        return user;
     }
 
     public TokenResponse refresh(RefreshRequest request) {

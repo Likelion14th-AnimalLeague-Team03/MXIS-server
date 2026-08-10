@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mxis.server.auth.dto.KakaoLoginRequest;
 import com.mxis.server.auth.dto.LoginRequest;
 import com.mxis.server.auth.dto.RefreshRequest;
 import com.mxis.server.auth.dto.SignupRequest;
@@ -135,6 +136,44 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error.code", is("INVALID_TOKEN")));
+    }
+
+    @Test
+    void kakaoLogin_success_returnsTokens() throws Exception {
+        KakaoLoginRequest request = new KakaoLoginRequest("kakao-access-token");
+        given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
+                .willReturn(new TokenResponse("access-token", "refresh-token", "Bearer"));
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken", is("access-token")))
+                .andExpect(jsonPath("$.data.tokenType", is("Bearer")));
+    }
+
+    @Test
+    void kakaoLogin_invalidKakaoToken_returns401() throws Exception {
+        KakaoLoginRequest request = new KakaoLoginRequest("bad-token");
+        given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
+                .willThrow(new BusinessException(ErrorCode.KAKAO_AUTH_FAILED));
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code", is("KAKAO_AUTH_FAILED")));
+    }
+
+    @Test
+    void kakaoLogin_blankAccessToken_returns400() throws Exception {
+        String body = "{\"accessToken\": \"\"}";
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code", is("INVALID_INPUT")));
     }
 
     @Test

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.device.controller.DeviceControllerTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-08-10T01:27:47" hostname="minuui-MacBookAir.local" time="0.057">
+<testsuite name="com.mxis.server.device.controller.DeviceControllerTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-08-10T08:11:12" hostname="minuui-MacBookAir.local" time="0.055">
   <properties/>
   <testcase name="lookup_success_returnsRegistrable()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.009"/>
-  <testcase name="updateStatus_success_returnsUpdatedDevice()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.011"/>
+  <testcase name="updateStatus_success_returnsUpdatedDevice()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.012"/>
   <testcase name="register_alreadyRegistered_returns409()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.007"/>
   <testcase name="lookup_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.002"/>
-  <testcase name="getDevice_notFound_returns404()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.004"/>
-  <testcase name="register_success_returns201()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.004"/>
+  <testcase name="getDevice_notFound_returns404()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.003"/>
+  <testcase name="register_success_returns201()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.003"/>
   <testcase name="updateStatus_batteryLevelOutOfRange_returns400()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.004"/>
-  <testcase name="delete_success_returns204()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.003"/>
+  <testcase name="delete_success_returns204()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.004"/>
   <testcase name="getMyDevices_success_returnsList()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.003"/>
   <testcase name="register_blankSerialNumber_returns400()" classname="com.mxis.server.device.controller.DeviceControllerTest" time="0.003"/>
-  <system-out><![CDATA[2026-08-10T10:27:47.027+09:00  INFO 50377 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.device.controller.DeviceControllerTest]: DeviceControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-10T10:27:47.037+09:00  INFO 50377 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.device.controller.DeviceControllerTest
+  <system-out><![CDATA[2026-08-10T17:11:12.471+09:00  INFO 51250 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.device.controller.DeviceControllerTest]: DeviceControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-10T17:11:12.480+09:00  INFO 51250 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.device.controller.DeviceControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -23,23 +23,23 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-10T10:27:47.050+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Starting DeviceControllerTest using Java 17.0.17 with PID 50377 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-10T10:27:47.050+09:00 DEBUG 50377 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-10T10:27:47.050+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : The following 1 profile is active: "local"
-2026-08-10T10:27:47.148+09:00  WARN 50377 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-10T17:11:12.492+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Starting DeviceControllerTest using Java 17.0.17 with PID 51250 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-10T17:11:12.492+09:00 DEBUG 51250 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-10T17:11:12.492+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : The following 1 profile is active: "local"
+2026-08-10T17:11:12.584+09:00  WARN 51250 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 97780d62-7acf-449e-a50f-7a9db4185da5
+Using generated security password: 25dc98e3-afd5-4b62-bec5-a4d0a98583ca
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-10T10:27:47.149+09:00  INFO 50377 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-10T10:27:47.178+09:00 DEBUG 50377 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-10T10:27:47.179+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-10T10:27:47.179+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-10T10:27:47.179+09:00  INFO 50377 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-10T10:27:47.183+09:00  INFO 50377 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Started DeviceControllerTest in 0.144 seconds (process running for 1.726)
-2026-08-10T10:27:47.212+09:00  WARN 50377 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 등록된 기기입니다.
-2026-08-10T10:27:47.220+09:00  WARN 50377 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기 정보를 찾을 수 없습니다.
+2026-08-10T17:11:12.584+09:00  INFO 51250 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-10T17:11:12.611+09:00 DEBUG 51250 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-10T17:11:12.611+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-10T17:11:12.611+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-10T17:11:12.611+09:00  INFO 51250 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-10T17:11:12.615+09:00  INFO 51250 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Started DeviceControllerTest in 0.134 seconds (process running for 1.739)
+2026-08-10T17:11:12.644+09:00  WARN 51250 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 등록된 기기입니다.
+2026-08-10T17:11:12.653+09:00  WARN 51250 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기 정보를 찾을 수 없습니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
