@@ -1,5 +1,6 @@
 package com.mxis.server.sensor.service;
 
+import com.mxis.server.care.service.CareDiagnosisService;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.entity.Device;
@@ -26,6 +27,7 @@ public class SensorReadingService {
     private final SensorReadingRepository sensorReadingRepository;
     private final DeviceRepository deviceRepository;
     private final ProductDeviceRepository productDeviceRepository;
+    private final CareDiagnosisService careDiagnosisService;
 
     @Transactional
     public SensorReadingBatchResponse syncBatch(Long userId, Long deviceId, SensorReadingBatchRequest request) {
@@ -69,6 +71,12 @@ public class SensorReadingService {
 
         LocalDateTime syncedAt = LocalDateTime.now();
         device.markSynced(syncedAt);
+
+        // 동기화 직후 진단을 갱신한다. 집계 쿼리가 방금 저장한 행을 보도록 먼저 flush한다
+        // (네이티브 집계 쿼리는 JPA의 자동 flush 대상이 아니다).
+        // ponytail: 같은 트랜잭션에서 동기 처리. 배치가 커져 응답이 느려지면 @Async로 분리한다.
+        sensorReadingRepository.flush();
+        careDiagnosisService.regenerate(link.getProduct());
 
         return new SensorReadingBatchResponse(
                 request.readings().size(),
