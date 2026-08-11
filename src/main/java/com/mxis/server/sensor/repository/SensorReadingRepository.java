@@ -63,4 +63,20 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     List<Object[]> findDailyHumidity(@Param("productId") Long productId,
                                      @Param("from") LocalDateTime from,
                                      @Param("to") LocalDateTime to);
+
+    /**
+     * 그래프용 월별(해당 월 1일 기준) 평균 습도. 1년 조회에서 사용. 각 행은 [java.sql.Date, Number].
+     * DATE_FORMAT()은 MariaDB에서 문자열을 반환하므로 DATE로 CAST해 findDailyHumidity와 반환 타입을 맞춘다.
+     */
+    @Query(value = """
+            SELECT CAST(DATE_FORMAT(measured_at, '%Y-%m-01') AS DATE) AS month, AVG(humidity) AS avg_humidity
+            FROM sensor_readings
+            WHERE product_id = :productId AND humidity IS NOT NULL
+              AND measured_at >= :from AND measured_at < :to
+            GROUP BY month
+            ORDER BY month
+            """, nativeQuery = true)
+    List<Object[]> findMonthlyHumidity(@Param("productId") Long productId,
+                                       @Param("from") LocalDateTime from,
+                                       @Param("to") LocalDateTime to);
 }
