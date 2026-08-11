@@ -23,6 +23,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -130,7 +131,7 @@ public class CareQueryService {
 
         return new SensorSummaryResponse(
                 period,
-                humidityTrend(productId, from, now),
+                humidityTrend(period, productId, from, now),
                 scale(current.avgTemperature()),
                 scale(current.avgHumidity()),
                 period.isYear() ? null : outing,
@@ -146,13 +147,61 @@ public class CareQueryService {
                 productId, from, to, CareRuleEngine.DRY_THRESHOLD, CareRuleEngine.STRONG_SHOCK_THRESHOLD);
     }
 
+    /**
+     * 기간별로 그래프 포인트 개수·간격을 다르게 낸다 (api-spec.md "환경 데이터 상세" 샘플링 규칙 확정):
+     * 7D는 일별 그대로, 30D는 변곡점만 추려서 오르내림 폭이 잘 보이게, 1Y는 월별 평균.
+     */
     private List<SensorSummaryResponse.HumidityPoint> humidityTrend(
-            Long productId, LocalDateTime from, LocalDateTime to) {
-        return sensorReadingRepository.findDailyHumidity(productId, from, to).stream()
+            SensorPeriod period, Long productId, LocalDateTime from, LocalDateTime to) {
+        if (period.isYear()) {
+            return toHumidityPoints(sensorReadingRepository.findMonthlyHumidity(productId, from, to));
+        }
+
+        List<SensorSummaryResponse.HumidityPoint> daily =
+                toHumidityPoints(sensorReadingRepository.findDailyHumidity(productId, from, to));
+        return period == SensorPeriod.THIRTY_DAYS ? extractTurningPoints(daily) : daily;
+    }
+
+    private List<SensorSummaryResponse.HumidityPoint> toHumidityPoints(List<Object[]> rows) {
+        return rows.stream()
                 .map(row -> new SensorSummaryResponse.HumidityPoint(
                         ((Date) row[0]).toLocalDate(),
                         BigDecimal.valueOf(((Number) row[1]).doubleValue()).setScale(1, RoundingMode.HALF_UP)))
                 .toList();
+    }
+
+    /**
+     * 변곡점(turning point) 추출: 양 끝은 항상 남기고, 중간은 추세가 꺾이는 지점(직전 구간과 다음 구간의
+     * 증감 방향이 다른 지점)만 남긴다. 값이 계속 오르거나 내리기만 하는 구간은 양 끝만 남아 점이 줄고,
+     * 오르내림이 잦은 구간은 점이 그만큼 남아 상승·하강 폭이 그래프에 그대로 드러난다.
+     */
+    /** package-private for direct unit testing (순수 함수, DB 접근 없음). */
+    List<SensorSummaryResponse.HumidityPoint> extractTurningPoints(
+            List<SensorSummaryResponse.HumidityPoint> points) {
+        if (points.size() <= 2) {
+            return points;
+        }
+
+        List<SensorSummaryResponse.HumidityPoint> result = new ArrayList<>();
+        result.add(points.get(0));
+
+        for (int i = 1; i < points.size() - 1; i++) {
+            BigDecimal prev = points.get(i - 1).value();
+            BigDecimal curr = points.get(i).value();
+            BigDecimal next = points.get(i + 1).value();
+
+            int risingIntoI = curr.compareTo(prev);
+            int risingFromI = next.compareTo(curr);
+            boolean isTurningPoint = risingIntoI != 0 && risingFromI != 0
+                    && Integer.signum(risingIntoI) != Integer.signum(risingFromI);
+
+            if (isTurningPoint) {
+                result.add(points.get(i));
+            }
+        }
+
+        result.add(points.get(points.size() - 1));
+        return result;
     }
 
     /** 직전 동일 기간 대비 비교 문구. 규칙 기반 템플릿이며 AI를 쓰지 않는다. */
