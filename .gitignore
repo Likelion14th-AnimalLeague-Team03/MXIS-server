@@ -3,3 +3,6 @@ local-rules.md
 api-spec.md
 work-log.md
 erd.md
+application.yml
+application-local.yml
+.idea/workspace.xml
