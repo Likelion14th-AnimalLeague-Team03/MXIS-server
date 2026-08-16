@@ -40,7 +40,8 @@ public class ProductService {
                 request.dppCode(),
                 request.productName(),
                 request.modelCode(),
-                request.material(),
+                request.materialId(),
+                request.materialSubtypes(),
                 request.color(),
                 request.imageUrl(),
                 request.purchasedAt());

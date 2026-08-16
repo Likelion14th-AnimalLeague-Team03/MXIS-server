@@ -29,6 +29,7 @@ public class NotificationSettingService {
                 request.reservationEnabled(),
                 request.deviceStatusEnabled(),
                 request.marketingEnabled(),
+                request.environmentAlertEnabled(),
                 request.pushPermissionGranted(),
                 request.pushToken());
         return NotificationSettingResponse.from(setting);

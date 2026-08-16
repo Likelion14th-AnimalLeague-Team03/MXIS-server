@@ -3,6 +3,7 @@ package com.mxis.server.product.entity;
 import com.mxis.server.common.entity.BaseTimeEntity;
 import com.mxis.server.user.entity.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,8 +42,12 @@ public class Product extends BaseTimeEntity {
     @Column(name = "model_code", length = 50)
     private String modelCode;
 
-    @Column(nullable = false, length = 50)
-    private String material;
+    @Column(name = "material_id", nullable = false, length = 50)
+    private String materialId;
+
+    @Convert(converter = StringListJsonConverter.class)
+    @Column(name = "material_subtypes", columnDefinition = "json")
+    private List<String> materialSubtypes;
 
     @Column(length = 30)
     private String color;
@@ -59,12 +65,13 @@ public class Product extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     public Product(User user, String dppCode, String productName, String modelCode,
-                    String material, String color, String imageUrl, LocalDate purchasedAt) {
+                    String materialId, List<String> materialSubtypes, String color, String imageUrl, LocalDate purchasedAt) {
         this.user = user;
         this.dppCode = dppCode;
         this.productName = productName;
         this.modelCode = modelCode;
-        this.material = material;
+        this.materialId = materialId;
+        this.materialSubtypes = materialSubtypes == null ? List.of() : List.copyOf(materialSubtypes);
         this.color = color;
         this.imageUrl = imageUrl;
         this.purchasedAt = purchasedAt;

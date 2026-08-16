@@ -9,6 +9,7 @@ public record SensorReadingItem(
         BigDecimal temperature,
         BigDecimal humidity,
         BigDecimal maxShockLevel,
+        Integer motionCount,
         boolean isOuting,
         @NotNull LocalDateTime measuredAt
 ) {

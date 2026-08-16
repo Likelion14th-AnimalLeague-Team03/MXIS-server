@@ -7,6 +7,7 @@ public record NotificationSettingResponse(
         boolean reservationEnabled,
         boolean deviceStatusEnabled,
         boolean marketingEnabled,
+        boolean environmentAlertEnabled,
         boolean pushPermissionGranted
 ) {
     public static NotificationSettingResponse from(NotificationSetting setting) {
@@ -15,6 +16,7 @@ public record NotificationSettingResponse(
                 setting.isReservationEnabled(),
                 setting.isDeviceStatusEnabled(),
                 setting.isMarketingEnabled(),
+                setting.isEnvironmentAlertEnabled(),
                 setting.isPushPermissionGranted());
     }
 }

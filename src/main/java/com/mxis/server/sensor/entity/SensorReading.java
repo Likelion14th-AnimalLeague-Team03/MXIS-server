@@ -58,6 +58,9 @@ public class SensorReading {
     @Column(name = "max_shock_level", precision = 6, scale = 3)
     private BigDecimal maxShockLevel;
 
+    @Column(name = "motion_count")
+    private Integer motionCount;
+
     @Column(name = "is_outing", nullable = false)
     private boolean isOuting;
 
@@ -69,7 +72,7 @@ public class SensorReading {
 
     public SensorReading(Product product, Device device, ProductDevice productDevice, Long sequenceNumber,
                           BigDecimal temperature, BigDecimal humidity, BigDecimal maxShockLevel,
-                          boolean isOuting, LocalDateTime measuredAt) {
+                          Integer motionCount, boolean isOuting, LocalDateTime measuredAt) {
         this.product = product;
         this.device = device;
         this.productDevice = productDevice;
@@ -77,6 +80,7 @@ public class SensorReading {
         this.temperature = temperature;
         this.humidity = humidity;
         this.maxShockLevel = maxShockLevel;
+        this.motionCount = motionCount;
         this.isOuting = isOuting;
         this.measuredAt = measuredAt;
         this.syncedAt = LocalDateTime.now();

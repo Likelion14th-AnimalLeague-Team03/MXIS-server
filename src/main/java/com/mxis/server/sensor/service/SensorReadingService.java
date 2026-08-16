@@ -63,6 +63,7 @@ public class SensorReadingService {
                         item.temperature(),
                         item.humidity(),
                         item.maxShockLevel(),
+                        item.motionCount(),
                         item.isOuting(),
                         item.measuredAt()))
                 .toList();

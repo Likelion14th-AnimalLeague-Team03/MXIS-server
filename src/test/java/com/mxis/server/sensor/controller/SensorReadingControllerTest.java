@@ -57,7 +57,7 @@ class SensorReadingControllerTest {
     void syncBatch_success_returns201() throws Exception {
         SensorReadingBatchRequest request = new SensorReadingBatchRequest(List.of(
                 new SensorReadingItem(1L, new BigDecimal("22.5"), new BigDecimal("45.0"),
-                        new BigDecimal("0.3"), false, LocalDateTime.now())));
+                        new BigDecimal("0.3"), 2, false, LocalDateTime.now())));
         given(sensorReadingService.syncBatch(eq(1L), eq(10L), any(SensorReadingBatchRequest.class)))
                 .willReturn(new SensorReadingBatchResponse(1, 1, 0, LocalDateTime.now()));
 
@@ -85,7 +85,7 @@ class SensorReadingControllerTest {
     @Test
     void syncBatch_deviceNotLinked_returns409() throws Exception {
         SensorReadingBatchRequest request = new SensorReadingBatchRequest(List.of(
-                new SensorReadingItem(1L, null, null, null, false, LocalDateTime.now())));
+                new SensorReadingItem(1L, null, null, null, null, false, LocalDateTime.now())));
         given(sensorReadingService.syncBatch(eq(1L), eq(10L), any(SensorReadingBatchRequest.class)))
                 .willThrow(new BusinessException(ErrorCode.DEVICE_NOT_LINKED_TO_PRODUCT));
 
@@ -100,7 +100,7 @@ class SensorReadingControllerTest {
     @Test
     void syncBatch_withoutToken_returns401() throws Exception {
         SensorReadingBatchRequest request = new SensorReadingBatchRequest(List.of(
-                new SensorReadingItem(1L, null, null, null, false, LocalDateTime.now())));
+                new SensorReadingItem(1L, null, null, null, null, false, LocalDateTime.now())));
 
         mockMvc.perform(post("/api/v1/devices/10/sensor-readings/batch")
                         .contentType(MediaType.APPLICATION_JSON)

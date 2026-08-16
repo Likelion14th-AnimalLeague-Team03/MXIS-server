@@ -39,6 +39,9 @@ public class NotificationSetting extends BaseTimeEntity {
     @Column(name = "marketing_enabled", nullable = false)
     private boolean marketingEnabled = false;
 
+    @Column(name = "environment_alert_enabled", nullable = false)
+    private boolean environmentAlertEnabled = true;
+
     @Column(name = "push_permission_granted", nullable = false)
     private boolean pushPermissionGranted = false;
 
@@ -50,11 +53,13 @@ public class NotificationSetting extends BaseTimeEntity {
     }
 
     public void update(Boolean careTimingEnabled, Boolean reservationEnabled, Boolean deviceStatusEnabled,
-                        Boolean marketingEnabled, Boolean pushPermissionGranted, String pushToken) {
+                        Boolean marketingEnabled, Boolean environmentAlertEnabled,
+                        Boolean pushPermissionGranted, String pushToken) {
         if (careTimingEnabled != null) this.careTimingEnabled = careTimingEnabled;
         if (reservationEnabled != null) this.reservationEnabled = reservationEnabled;
         if (deviceStatusEnabled != null) this.deviceStatusEnabled = deviceStatusEnabled;
         if (marketingEnabled != null) this.marketingEnabled = marketingEnabled;
+        if (environmentAlertEnabled != null) this.environmentAlertEnabled = environmentAlertEnabled;
         if (pushPermissionGranted != null) this.pushPermissionGranted = pushPermissionGranted;
         if (pushToken != null) this.pushToken = pushToken;
     }

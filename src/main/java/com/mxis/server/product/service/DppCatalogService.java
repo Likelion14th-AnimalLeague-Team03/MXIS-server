@@ -3,6 +3,7 @@ package com.mxis.server.product.service;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.product.dto.ProductRecognizeResponse;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +19,12 @@ public class DppCatalogService {
 
     private static final Map<String, ProductRecognizeResponse> DEMO_CATALOG = Map.of(
             "MCM-DPP-0001", new ProductRecognizeResponse(
-                    "MCM-DPP-0001", "MCM Aren Shopper", "AREN-SHP-001", "Visetos Coated Canvas", "Cognac",
+                    "MCM-DPP-0001", "MCM Aren Shopper", "AREN-SHP-001", "canvas",
+                    List.of("coated_canvas"), "Cognac",
                     "https://static.mcmworldwide.com/demo/aren-shopper.jpg"),
             "MCM-DPP-0002", new ProductRecognizeResponse(
-                    "MCM-DPP-0002", "MCM Milla Tote", "MILLA-TOTE-002", "Full Grain Leather", "Black",
+                    "MCM-DPP-0002", "MCM Milla Tote", "MILLA-TOTE-002", "natural_leather",
+                    List.of(), "Black",
                     "https://static.mcmworldwide.com/demo/milla-tote.jpg")
     );
 
