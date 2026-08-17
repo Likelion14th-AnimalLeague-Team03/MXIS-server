@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mxis.server.common.enums.ReservationStatus;
+import com.mxis.server.common.enums.ReservationType;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.common.security.JwtAuthenticationFilter;
@@ -64,13 +65,13 @@ class ReservationControllerTest {
     }
 
     private ReservationCreateRequest createRequest() {
-        return new ReservationCreateRequest(20L, 1L, 5L, "가죽 컨디셔닝",
+        return new ReservationCreateRequest(20L, 1L, 5L, "가죽 컨디셔닝", ReservationType.FREE,
                 RESERVED_DATE, RESERVED_TIME, "모서리 마모가 신경쓰여요");
     }
 
     private ReservationResponse sampleReservation() {
         return new ReservationResponse(100L, 20L, "MCM Aren Shopper", 1L, "MCM 청담 플래그십",
-                "서울 강남구 압구정로 452", "02-1234-5678", 5L, "가죽 컨디셔닝",
+                "서울 강남구 압구정로 452", "02-1234-5678", 5L, "가죽 컨디셔닝", ReservationType.FREE,
                 RESERVED_DATE, RESERVED_TIME, "모서리 마모가 신경쓰여요",
                 ReservationStatus.CONFIRMED, null, null, LocalDateTime.now(), LocalDateTime.now());
     }
@@ -102,7 +103,7 @@ class ReservationControllerTest {
     @Test
     void create_missingRequiredField_returns400() throws Exception {
         ReservationCreateRequest invalid = new ReservationCreateRequest(
-                null, 1L, null, null, RESERVED_DATE, RESERVED_TIME, null);
+                null, 1L, null, null, null, RESERVED_DATE, RESERVED_TIME, null);
 
         mockMvc.perform(post("/api/v1/reservations")
                         .header("Authorization", "Bearer " + accessToken)
@@ -142,7 +143,8 @@ class ReservationControllerTest {
     void getMyReservations_success_returnsSummaryList() throws Exception {
         given(reservationService.getMyReservations(eq(1L), eq(ReservationStatus.CONFIRMED)))
                 .willReturn(List.of(new ReservationSummaryResponse(100L, 20L, "MCM Aren Shopper",
-                        1L, "MCM 청담 플래그십", RESERVED_DATE, RESERVED_TIME, ReservationStatus.CONFIRMED)));
+                        1L, "MCM 청담 플래그십", ReservationType.FREE, RESERVED_DATE, RESERVED_TIME,
+                        ReservationStatus.CONFIRMED)));
 
         mockMvc.perform(get("/api/v1/reservations")
                         .param("status", "CONFIRMED")
