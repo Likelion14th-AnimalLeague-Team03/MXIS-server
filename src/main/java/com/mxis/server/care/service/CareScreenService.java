@@ -1,5 +1,7 @@
 package com.mxis.server.care.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mxis.server.care.dto.CareDiagnosisHomeResponse;
 import com.mxis.server.care.dto.CareEnvironmentOverviewResponse;
 import com.mxis.server.care.dto.CareEnvironmentResponse;
@@ -38,16 +40,18 @@ public class CareScreenService {
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
     private final CareQueryService careQueryService;
+    private final ObjectMapper objectMapper;
 
     public CareDiagnosisHomeResponse getDiagnosisHome(Long userId, Long productId) {
         Product product = getOwnedProduct(userId, productId);
         CareReport report = latestReport(productId);
+        JsonNode ai = aiCareSummary(report);
         return new CareDiagnosisHomeResponse(
                 ScreenProductSummary.from(product),
                 sensorReadingRepository.countTotalOutingSessions(productId),
                 new CareDiagnosisHomeResponse.ConditionSummary(
-                        report.getSummaryText(),
-                        report.getAnalysisText()),
+                        diagnosisHomeSummary(ai, report),
+                        diagnosisHomeDescription(ai, report)),
                 new CareDiagnosisHomeResponse.Environment30d(
                         report.getAvgTemperature(),
                         ruleEngine.temperatureLabel(report.getAvgTemperature()),
@@ -60,13 +64,15 @@ public class CareScreenService {
     public CareReportScreenResponse getReport(Long userId, Long productId) {
         getOwnedProduct(userId, productId);
         CareReport report = latestReport(productId);
-        int careCycleMonths = careCycleMonths(report.getConditionGrade());
+        JsonNode ai = aiCareSummary(report);
+        boolean careNeeded = careNeeded(ai, report);
+        int careCycleMonths = careCycleMonths(ai, report.getConditionGrade());
         return new CareReportScreenResponse(
                 report.getId(),
                 report.getCreatedAt(),
                 new CareReportScreenResponse.ConditionReport(
-                        report.getSummaryText(),
-                        report.getAnalysisText()),
+                        careReportSummary(ai, report),
+                        careReportDetail(ai, report)),
                 new CareReportScreenResponse.Environment30d(
                         report.getAvgTemperature(),
                         ruleEngine.temperatureLabel(report.getAvgTemperature()),
@@ -74,8 +80,8 @@ public class CareScreenService {
                         ruleEngine.humidityGrade(report.getAvgHumidity()).label(),
                         ruleEngine.shockGrade(orZero(report.getShockCount())).label(),
                         orZero(report.getOutingCount())),
-                report.getRecommendationText(),
-                ruleEngine.needsSuggestion(report.getConditionGrade()),
+                interpretation(ai, report),
+                careNeeded,
                 careCycleMonths,
                 report.getPeriodEnd().toLocalDate().plusMonths(careCycleMonths));
     }
@@ -165,6 +171,76 @@ public class CareScreenService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NO_DIAGNOSIS_DATA));
     }
 
+    private JsonNode aiCareSummary(CareReport report) {
+        String aiOutput = report.getAiOutput();
+        if (aiOutput == null || aiOutput.isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode root = objectMapper.readTree(aiOutput);
+            JsonNode summary = root.path("aiCareSummary");
+            return summary.isMissingNode() ? null : summary;
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private String diagnosisHomeSummary(JsonNode ai, CareReport report) {
+        return firstText(
+                path(ai, "llmCopy", "diagnosisHome", "short"),
+                path(ai, "explanation", "short"),
+                textNode(report.getSummaryText()));
+    }
+
+    private String diagnosisHomeDescription(JsonNode ai, CareReport report) {
+        List<String> bullets = stringList(path(ai, "llmCopy", "diagnosisHome", "reasonBullets"));
+        if (bullets.isEmpty()) {
+            bullets = stringList(path(ai, "explanation", "reasonBullets"));
+        }
+        if (!bullets.isEmpty()) {
+            return String.join(" ", bullets);
+        }
+        return report.getAnalysisText();
+    }
+
+    private String careReportSummary(JsonNode ai, CareReport report) {
+        return firstText(
+                path(ai, "llmCopy", "careReport", "short"),
+                path(ai, "explanation", "short"),
+                textNode(report.getSummaryText()));
+    }
+
+    private String careReportDetail(JsonNode ai, CareReport report) {
+        List<String> bullets = stringList(path(ai, "llmCopy", "careReport", "reasonBullets"));
+        if (bullets.isEmpty()) {
+            bullets = stringList(path(ai, "explanation", "reasonBullets"));
+        }
+        if (!bullets.isEmpty()) {
+            return String.join(" ", bullets);
+        }
+        return report.getAnalysisText();
+    }
+
+    private String interpretation(JsonNode ai, CareReport report) {
+        return firstText(
+                path(ai, "llmCopy", "environmentDetail", "short"),
+                path(ai, "llmCopy", "careGuide", "weeklyTip"),
+                textNode(report.getRecommendationText()));
+    }
+
+    private boolean careNeeded(JsonNode ai, CareReport report) {
+        String careNeed = text(path(ai, "careDecision", "careNeed"));
+        String inspectionNeed = text(path(ai, "careDecision", "inspectionNeed"));
+        if (careNeed != null || inspectionNeed != null) {
+            return "REQUIRED".equals(inspectionNeed)
+                    || "CONDITIONAL".equals(inspectionNeed)
+                    || "MEDIUM".equals(careNeed)
+                    || "MEDIUM_HIGH".equals(careNeed)
+                    || "HIGH".equals(careNeed);
+        }
+        return ruleEngine.needsSuggestion(report.getConditionGrade());
+    }
+
     private Product getOwnedProduct(Long userId, Long productId) {
         Product product = productRepository.findActiveById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -174,12 +250,67 @@ public class CareScreenService {
         return product;
     }
 
+    private int careCycleMonths(JsonNode ai, CareConditionGrade grade) {
+        String careNeed = text(path(ai, "careDecision", "careNeed"));
+        String inspectionNeed = text(path(ai, "careDecision", "inspectionNeed"));
+        if ("REQUIRED".equals(inspectionNeed) || "HIGH".equals(careNeed)) {
+            return 1;
+        }
+        if ("CONDITIONAL".equals(inspectionNeed) || "MEDIUM_HIGH".equals(careNeed) || "MEDIUM".equals(careNeed)) {
+            return 3;
+        }
+        if ("LOW_MEDIUM".equals(careNeed)) {
+            return 6;
+        }
+        return careCycleMonths(grade);
+    }
+
     private int careCycleMonths(CareConditionGrade grade) {
         return switch (grade) {
             case STABLE, BALANCED -> 6;
             case LIGHT_CARE -> 3;
             case EXPERT_CHECK -> 1;
         };
+    }
+
+    private JsonNode path(JsonNode node, String... fieldNames) {
+        JsonNode current = node;
+        for (String fieldName : fieldNames) {
+            if (current == null || current.isMissingNode() || current.isNull()) {
+                return null;
+            }
+            current = current.path(fieldName);
+        }
+        return current == null || current.isMissingNode() || current.isNull() ? null : current;
+    }
+
+    private String text(JsonNode node) {
+        return node != null && node.isTextual() && !node.asText().isBlank() ? node.asText() : null;
+    }
+
+    private JsonNode textNode(String value) {
+        return value == null ? null : objectMapper.getNodeFactory().textNode(value);
+    }
+
+    private String firstText(JsonNode first, JsonNode second, JsonNode third) {
+        JsonNode[] nodes = {first, second, third};
+        for (JsonNode node : nodes) {
+            String text = text(node);
+            if (text != null) {
+                return text;
+            }
+        }
+        return "";
+    }
+
+    private List<String> stringList(JsonNode node) {
+        if (node == null || !node.isArray()) {
+            return List.of();
+        }
+        return java.util.stream.StreamSupport.stream(node.spliterator(), false)
+                .filter(JsonNode::isTextual)
+                .map(JsonNode::asText)
+                .toList();
     }
 
     private static int orZero(Integer value) {

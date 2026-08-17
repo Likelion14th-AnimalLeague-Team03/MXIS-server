@@ -105,6 +105,30 @@ public class CareReport extends BaseCreatedAtEntity {
         this.aiOutput = minimalAiOutput(conditionGrade, summaryText, periodStart, periodEnd);
     }
 
+    public CareReport(Product product, CareAlgorithm algorithm, CareConditionGrade conditionGrade,
+                      String summaryText, String analysisText, String recommendationText,
+                      LocalDateTime periodStart, LocalDateTime periodEnd,
+                      BigDecimal avgTemperature, BigDecimal maxTemperature, BigDecimal minTemperature,
+                      BigDecimal avgHumidity, Integer outingCount, Integer shockCount, String aiOutput) {
+        this.product = product;
+        this.algorithm = algorithm;
+        this.conditionGrade = conditionGrade;
+        this.summaryText = summaryText;
+        this.analysisText = analysisText;
+        this.recommendationText = recommendationText;
+        this.periodStart = periodStart;
+        this.periodEnd = periodEnd;
+        this.avgTemperature = avgTemperature;
+        this.maxTemperature = maxTemperature;
+        this.minTemperature = minTemperature;
+        this.avgHumidity = avgHumidity;
+        this.outingCount = outingCount;
+        this.shockCount = shockCount;
+        this.aiOutput = aiOutput == null || aiOutput.isBlank()
+                ? minimalAiOutput(conditionGrade, summaryText, periodStart, periodEnd)
+                : aiOutput;
+    }
+
     private static String minimalAiOutput(CareConditionGrade conditionGrade, String summaryText,
                                           LocalDateTime periodStart, LocalDateTime periodEnd) {
         return """
