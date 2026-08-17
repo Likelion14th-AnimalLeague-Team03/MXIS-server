@@ -58,12 +58,14 @@ class ProductControllerTest {
     }
 
     private ProductResponse sampleProduct() {
-        return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
+        return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A",
+                "natural_leather", "Spanish Nappa Leather", List.of(), "블랙",
                 "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), false);
     }
 
     private ProductResponse samplePrimaryProduct() {
-        return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
+        return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A",
+                "natural_leather", "Spanish Nappa Leather", List.of(), "블랙",
                 "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), true);
     }
 
@@ -81,7 +83,7 @@ class ProductControllerTest {
     void recognize_success_returnsProductInfo() throws Exception {
         ProductRecognizeRequest request = new ProductRecognizeRequest("DPP-001");
         given(productService.recognize("DPP-001")).willReturn(new ProductRecognizeResponse(
-                "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
+                "DPP-001", "트리케 백", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙",
                 "https://example.com/product.png"));
 
         mockMvc.perform(post("/api/v1/products/recognize")
@@ -109,7 +111,7 @@ class ProductControllerTest {
     @Test
     void register_blankProductName_returns400() throws Exception {
         ProductRegisterRequest request = new ProductRegisterRequest(
-                "DPP-001", "", "MODEL-A", "natural_leather", List.of(), "블랙", null, null);
+                "DPP-001", "", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙", null, null);
 
         mockMvc.perform(post("/api/v1/products")
                         .header("Authorization", "Bearer " + accessToken)
@@ -122,7 +124,7 @@ class ProductControllerTest {
     @Test
     void register_success_returns201() throws Exception {
         ProductRegisterRequest request = new ProductRegisterRequest(
-                "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙", null,
+                "DPP-001", "트리케 백", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙", null,
                 LocalDate.of(2025, 1, 1));
         given(productService.register(eq(1L), any(ProductRegisterRequest.class))).willReturn(sampleProduct());
 

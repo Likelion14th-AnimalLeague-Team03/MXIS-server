@@ -41,6 +41,7 @@ public class ProductService {
                 request.productName(),
                 request.modelCode(),
                 request.materialId(),
+                request.materialDisplayName(),
                 request.materialSubtypes(),
                 request.color(),
                 request.productImageUrl(),

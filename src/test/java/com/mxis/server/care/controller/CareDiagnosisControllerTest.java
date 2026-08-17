@@ -66,7 +66,8 @@ class CareDiagnosisControllerTest {
     @Test
     void getCareDashboard_success_returnsGradeAndLabels() throws Exception {
         given(careQueryService.getDashboard(eq(1L), eq(20L))).willReturn(new CareDashboardResponse(
-                new CareDashboardResponse.ProductSummary(20L, "MCM Aren Shopper", "Visetos Canvas", "Cognac", null),
+                new CareDashboardResponse.ProductSummary(
+                        20L, "MCM Aren Shopper", "canvas", "Visetos Canvas", "Cognac", null),
                 new CareDashboardResponse.DeviceSummary(DeviceConnectionStatus.CONNECTED, LocalDateTime.now()),
                 CareConditionGrade.BALANCED,
                 "균형 있게 유지되고 있습니다.",

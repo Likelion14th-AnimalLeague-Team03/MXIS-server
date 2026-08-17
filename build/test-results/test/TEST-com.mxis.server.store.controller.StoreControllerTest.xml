@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.store.controller.StoreControllerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-08-17T06:46:53" hostname="minuui-MacBookAir.local" time="0.022">
+<testsuite name="com.mxis.server.store.controller.StoreControllerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-08-17T09:15:54" hostname="minuui-MacBookAir.local" time="0.018">
   <properties/>
   <testcase name="getAvailableTimes_missingDate_returns400()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.005"/>
-  <testcase name="getAvailableTimes_success_returnsSlots()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.004"/>
-  <testcase name="getAvailableTimes_storeNotFound_returns404()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.004"/>
-  <testcase name="getStores_withoutCoordinates_returnsNullDistance()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.004"/>
+  <testcase name="getAvailableTimes_success_returnsSlots()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.003"/>
+  <testcase name="getAvailableTimes_storeNotFound_returns404()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.002"/>
+  <testcase name="getStores_withoutCoordinates_returnsNullDistance()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.003"/>
   <testcase name="getStores_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.001"/>
   <testcase name="getStores_withCoordinates_returnsDistance()" classname="com.mxis.server.store.controller.StoreControllerTest" time="0.002"/>
-  <system-out><![CDATA[2026-08-17T15:46:53.397+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.store.controller.StoreControllerTest]: StoreControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T15:46:53.403+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.store.controller.StoreControllerTest
+  <system-out><![CDATA[2026-08-17T18:15:54.811+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.store.controller.StoreControllerTest]: StoreControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T18:15:54.816+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.store.controller.StoreControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -19,22 +19,22 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T15:46:53.409+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Starting StoreControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T15:46:53.409+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T15:46:53.409+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : The following 1 profile is active: "local"
-2026-08-17T15:46:53.471+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T18:15:54.822+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Starting StoreControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T18:15:54.822+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T18:15:54.822+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : The following 1 profile is active: "local"
+2026-08-17T18:15:54.882+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: ddf8eb2d-1674-4cc5-9fc6-dd65866f03a5
+Using generated security password: c5c6d118-9fa2-45a5-a2e1-16809796b6a3
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T15:46:53.472+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T15:46:53.492+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T15:46:53.492+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T15:46:53.492+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T15:46:53.492+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T15:46:53.495+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Started StoreControllerTest in 0.09 seconds (process running for 3.741)
-2026-08-17T15:46:53.507+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 매장 정보를 찾을 수 없습니다.
+2026-08-17T18:15:54.882+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T18:15:54.900+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T18:15:54.900+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T18:15:54.901+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T18:15:54.901+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-17T18:15:54.903+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Started StoreControllerTest in 0.086 seconds (process running for 3.158)
+2026-08-17T18:15:54.915+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 매장 정보를 찾을 수 없습니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

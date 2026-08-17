@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -79,6 +80,9 @@ public class CareReport extends BaseCreatedAtEntity {
     @Column(name = "shock_count")
     private Integer shockCount;
 
+    @Column(name = "ai_output", nullable = false, columnDefinition = "JSON")
+    private String aiOutput;
+
     public CareReport(Product product, CareAlgorithm algorithm, CareConditionGrade conditionGrade,
                       String summaryText, String analysisText, String recommendationText,
                       LocalDateTime periodStart, LocalDateTime periodEnd,
@@ -98,5 +102,28 @@ public class CareReport extends BaseCreatedAtEntity {
         this.avgHumidity = avgHumidity;
         this.outingCount = outingCount;
         this.shockCount = shockCount;
+        this.aiOutput = minimalAiOutput(conditionGrade, summaryText, periodStart, periodEnd);
+    }
+
+    private static String minimalAiOutput(CareConditionGrade conditionGrade, String summaryText,
+                                          LocalDateTime periodStart, LocalDateTime periodEnd) {
+        return """
+                {"schemaVersion":"care-report-snapshot-v0.1","productCondition":{"grade":"%s","summary":"%s"},"analysisWindow":{"periodStart":"%s","periodEnd":"%s"}}
+                """.formatted(
+                conditionGrade.name(),
+                escapeJson(summaryText),
+                periodStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                periodEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).trim();
+    }
+
+    private static String escapeJson(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 }

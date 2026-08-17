@@ -16,7 +16,7 @@ public record CareDashboardResponse(
         ActiveSuggestion activeSuggestion
 ) {
     public record ProductSummary(
-            Long id, String productName, String materialId, String color, String productImageUrl) {
+            Long id, String productName, String materialId, String materialDisplayName, String color, String productImageUrl) {
     }
 
     /** 대표 센서(PRIMARY_SENSOR) 기기의 상태. 연결된 기기가 없으면 필드가 모두 null. */

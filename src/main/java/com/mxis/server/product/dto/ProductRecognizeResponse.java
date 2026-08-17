@@ -7,6 +7,7 @@ public record ProductRecognizeResponse(
         String productName,
         String modelCode,
         String materialId,
+        String materialDisplayName,
         List<String> materialSubtypes,
         String color,
         String productImageUrl

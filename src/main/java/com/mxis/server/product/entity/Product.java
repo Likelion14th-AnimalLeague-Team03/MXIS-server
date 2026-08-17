@@ -45,6 +45,9 @@ public class Product extends BaseTimeEntity {
     @Column(name = "material_id", nullable = false, length = 50)
     private String materialId;
 
+    @Column(name = "material_display_name", length = 100)
+    private String materialDisplayName;
+
     @Convert(converter = StringListJsonConverter.class)
     @Column(name = "material_subtypes", columnDefinition = "json")
     private List<String> materialSubtypes;
@@ -65,13 +68,14 @@ public class Product extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     public Product(User user, String dppCode, String productName, String modelCode,
-                    String materialId, List<String> materialSubtypes, String color,
+                    String materialId, String materialDisplayName, List<String> materialSubtypes, String color,
                     String productImageUrl, LocalDate purchasedAt) {
         this.user = user;
         this.dppCode = dppCode;
         this.productName = productName;
         this.modelCode = modelCode;
         this.materialId = materialId;
+        this.materialDisplayName = materialDisplayName;
         this.materialSubtypes = materialSubtypes == null ? List.of() : List.copyOf(materialSubtypes);
         this.color = color;
         this.productImageUrl = productImageUrl;

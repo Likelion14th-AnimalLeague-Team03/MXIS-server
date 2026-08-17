@@ -5,11 +5,14 @@ import com.mxis.server.sensor.entity.SensorReading;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface SensorReadingRepository extends JpaRepository<SensorReading, Long> {
+
+    Optional<SensorReading> findFirstByProductIdOrderByMeasuredAtDesc(Long productId);
 
     @Query("""
             SELECT sr.sequenceNumber FROM SensorReading sr
@@ -50,6 +53,13 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     long countOutingSessions(@Param("productId") Long productId,
                              @Param("from") LocalDateTime from,
                              @Param("to") LocalDateTime to);
+
+    /** 제품 등록 이후 전체 외출 횟수. MVP 정책: is_outing=true가 1개 이상 존재한 날짜 수. */
+    @Query(value = """
+            SELECT COUNT(DISTINCT DATE(measured_at)) FROM sensor_readings
+            WHERE product_id = :productId AND is_outing = 1
+            """, nativeQuery = true)
+    long countTotalOutingSessions(@Param("productId") Long productId);
 
     /** 그래프용 일별 평균 습도. 각 행은 [java.sql.Date, Number]. */
     @Query(value = """

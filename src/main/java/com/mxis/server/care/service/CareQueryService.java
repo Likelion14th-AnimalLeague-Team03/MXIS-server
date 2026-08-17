@@ -52,6 +52,7 @@ public class CareQueryService {
     private final CareSuggestionRepository careSuggestionRepository;
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
+    private final OpenAiExplanationService openAiExplanationService;
 
     public AiCareSummaryResponse getAiCareSummary(Long userId, Long productId, SensorPeriod period) {
         getOwnedProduct(userId, productId);
@@ -71,7 +72,7 @@ public class CareQueryService {
                 ? summaryText(stress)
                 : "제품 상태 분석을 위해 데이터를 수집하고 있습니다.";
 
-        return new AiCareSummaryResponse(
+        AiCareSummaryResponse fallback = new AiCareSummaryResponse(
                 productId,
                 now,
                 period.days(),
@@ -94,6 +95,7 @@ public class CareQueryService {
                         "deterministic_fallback",
                         null,
                         null));
+        return openAiExplanationService.applyOpenAiCopy(fallback);
     }
 
     public CareEnvironmentResponse getCareEnvironment(Long userId, Long productId, SensorPeriod period) {
@@ -140,6 +142,7 @@ public class CareQueryService {
         return new CareDashboardResponse(
                 new CareDashboardResponse.ProductSummary(
                         product.getId(), product.getProductName(), product.getMaterialId(),
+                        product.getMaterialDisplayName(),
                         product.getColor(), product.getProductImageUrl()),
                 new CareDashboardResponse.DeviceSummary(
                         primaryDevice == null ? null : primaryDevice.getConnectionStatus(),
@@ -232,6 +235,9 @@ public class CareQueryService {
 
     private ReadingStats readingStats(Long productId, LocalDateTime from, LocalDateTime to) {
         Object[] row = sensorReadingRepository.findReadingStats(productId, from, to);
+        if (row.length == 1 && row[0] instanceof Object[] nestedRow) {
+            row = nestedRow;
+        }
         long count = row[0] == null ? 0L : ((Number) row[0]).longValue();
         LocalDateTime firstMeasuredAt = toLocalDateTime(row[1]);
         LocalDateTime lastMeasuredAt = toLocalDateTime(row[2]);

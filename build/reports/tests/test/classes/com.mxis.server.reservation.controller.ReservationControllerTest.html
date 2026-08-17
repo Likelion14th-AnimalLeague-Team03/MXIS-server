@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.032s</div>
+<div class="counter">0.023s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,7 +79,7 @@
 </thead>
 <tr>
 <td class="success">cancel_notFound_returns404()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -89,32 +89,32 @@
 </tr>
 <tr>
 <td class="success">create_missingRequiredField_returns400()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">create_pastDate_returns400()</td>
-<td class="success">0.006s</td>
+<td class="success">0.005s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">create_requiresAuth_returns401WithoutToken()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">create_slotTaken_returns409()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">create_success_returns201()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">getMyReservations_success_returnsSummaryList()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -124,7 +124,7 @@
 </tr>
 <tr>
 <td class="success">update_cancelledReservation_returns409()</td>
-<td class="success">0.004s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -132,8 +132,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-17T15:46:53.128+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.reservation.controller.ReservationControllerTest]: ReservationControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T15:46:53.133+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.reservation.controller.ReservationControllerTest
+<pre>2026-08-17T18:15:54.569+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.reservation.controller.ReservationControllerTest]: ReservationControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T18:15:54.574+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.reservation.controller.ReservationControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -144,26 +144,26 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T15:46:53.140+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Starting ReservationControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T15:46:53.140+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T15:46:53.140+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : The following 1 profile is active: &quot;local&quot;
-2026-08-17T15:46:53.213+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T18:15:54.580+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Starting ReservationControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T18:15:54.580+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T18:15:54.580+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : The following 1 profile is active: &quot;local&quot;
+2026-08-17T18:15:54.643+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 11d1db3a-4169-4662-bf91-5fac595ee9a0
+Using generated security password: 9804074a-13bc-4898-bc1c-cdc6aebb25fb
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T15:46:53.213+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T15:46:53.233+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T15:46:53.233+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T15:46:53.233+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T15:46:53.233+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T15:46:53.236+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Started ReservationControllerTest in 0.102 seconds (process running for 3.482)
-2026-08-17T15:46:53.242+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인의 예약이 아닙니다.
-2026-08-17T15:46:53.250+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 지난 날짜로는 예약할 수 없습니다.
-2026-08-17T15:46:53.254+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 예약된 시간대입니다.
-2026-08-17T15:46:53.259+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 예약 정보를 찾을 수 없습니다.
-2026-08-17T15:46:53.263+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 취소되었거나 완료된 예약은 변경할 수 없습니다.
+2026-08-17T18:15:54.643+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T18:15:54.666+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T18:15:54.666+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T18:15:54.666+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T18:15:54.666+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-17T18:15:54.669+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.r.c.ReservationControllerTest      : Started ReservationControllerTest in 0.094 seconds (process running for 2.924)
+2026-08-17T18:15:54.674+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인의 예약이 아닙니다.
+2026-08-17T18:15:54.682+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 지난 날짜로는 예약할 수 없습니다.
+2026-08-17T18:15:54.684+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 예약된 시간대입니다.
+2026-08-17T18:15:54.687+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 예약 정보를 찾을 수 없습니다.
+2026-08-17T18:15:54.690+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 취소되었거나 완료된 예약은 변경할 수 없습니다.
 </pre>
 </span>
 </div>
@@ -175,7 +175,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 3:46:53</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 6:15:55</p>
 </div>
 </div>
 </body>

@@ -10,6 +10,7 @@ public record ProductRegisterRequest(
         @NotBlank @Size(max = 100) String productName,
         @Size(max = 50) String modelCode,
         @NotBlank @Size(max = 50) String materialId,
+        @Size(max = 100) String materialDisplayName,
         List<@Size(max = 50) String> materialSubtypes,
         @Size(max = 30) String color,
         @Size(max = 500) String productImageUrl,

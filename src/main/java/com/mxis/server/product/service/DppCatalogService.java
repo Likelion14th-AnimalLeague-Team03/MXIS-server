@@ -19,11 +19,11 @@ public class DppCatalogService {
 
     private static final Map<String, ProductRecognizeResponse> DEMO_CATALOG = Map.of(
             "MCM-DPP-0001", new ProductRecognizeResponse(
-                    "MCM-DPP-0001", "MCM Aren Shopper", "AREN-SHP-001", "canvas",
+                    "MCM-DPP-0001", "MCM Aren Shopper", "AREN-SHP-001", "canvas", "Visetos Canvas",
                     List.of("coated_canvas"), "Cognac",
                     "https://static.mcmworldwide.com/demo/aren-shopper.jpg"),
             "MCM-DPP-0002", new ProductRecognizeResponse(
-                    "MCM-DPP-0002", "MCM Milla Tote", "MILLA-TOTE-002", "natural_leather",
+                    "MCM-DPP-0002", "MCM Milla Tote", "MILLA-TOTE-002", "natural_leather", "Spanish Nappa Leather",
                     List.of(), "Black",
                     "https://static.mcmworldwide.com/demo/milla-tote.jpg")
     );

@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.028s</div>
+<div class="counter">0.027s</div>
 <p>duration</p>
 </div>
 </td>
@@ -84,7 +84,7 @@
 </tr>
 <tr>
 <td class="success">getMe_success_returnsUser()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -94,12 +94,12 @@
 </tr>
 <tr>
 <td class="success">getNotificationSettings_success()</td>
-<td class="success">0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">updateConsents_emptyList_returns400()</td>
-<td class="success">0.010s</td>
+<td class="success">0.011s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -117,8 +117,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-17T15:46:53.520+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T15:46:53.526+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
+<pre>2026-08-17T18:15:54.924+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T18:15:54.929+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -129,21 +129,21 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T15:46:53.533+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T15:46:53.533+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T15:46:53.534+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
-2026-08-17T15:46:53.622+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T18:15:54.935+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T18:15:54.935+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T18:15:54.935+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
+2026-08-17T18:15:55.014+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 402387bb-a0fb-4f95-ab6c-8569a304d80a
+Using generated security password: bac39da3-991c-4059-aca6-fd4d06e261d5
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T15:46:53.622+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T15:46:53.642+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T15:46:53.644+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.117 seconds (process running for 3.89)
+2026-08-17T18:15:55.015+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T18:15:55.033+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T18:15:55.033+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T18:15:55.033+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T18:15:55.034+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-08-17T18:15:55.036+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.106 seconds (process running for 3.291)
 </pre>
 </span>
 </div>
@@ -155,7 +155,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 3:46:53</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 6:15:55</p>
 </div>
 </div>
 </body>
