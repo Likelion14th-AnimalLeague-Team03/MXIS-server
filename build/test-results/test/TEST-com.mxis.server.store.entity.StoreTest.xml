@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.mxis.server.store.entity.StoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-08-17T06:46:53" hostname="minuui-MacBookAir.local" time="0.001">
+  <properties/>
+  <testcase name="bookableSlots_respectsPerStoreOpeningTime()" classname="com.mxis.server.store.entity.StoreTest" time="0.001"/>
+  <testcase name="bookableSlots_invalidRange_returnsEmpty()" classname="com.mxis.server.store.entity.StoreTest" time="0.0"/>
+  <testcase name="bookableSlots_lastSlotIsHalfHourBeforeClosing()" classname="com.mxis.server.store.entity.StoreTest" time="0.0"/>
+  <testcase name="isBookableAt_rejectsOffGridAndOutOfHours()" classname="com.mxis.server.store.entity.StoreTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -52,8 +52,8 @@ public class Product extends BaseTimeEntity {
     @Column(length = 30)
     private String color;
 
-    @Column(name = "image_url", length = 500)
-    private String imageUrl;
+    @Column(name = "product_image_url", length = 500)
+    private String productImageUrl;
 
     @Column(name = "purchased_at")
     private LocalDate purchasedAt;
@@ -65,7 +65,8 @@ public class Product extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     public Product(User user, String dppCode, String productName, String modelCode,
-                    String materialId, List<String> materialSubtypes, String color, String imageUrl, LocalDate purchasedAt) {
+                    String materialId, List<String> materialSubtypes, String color,
+                    String productImageUrl, LocalDate purchasedAt) {
         this.user = user;
         this.dppCode = dppCode;
         this.productName = productName;
@@ -73,7 +74,7 @@ public class Product extends BaseTimeEntity {
         this.materialId = materialId;
         this.materialSubtypes = materialSubtypes == null ? List.of() : List.copyOf(materialSubtypes);
         this.color = color;
-        this.imageUrl = imageUrl;
+        this.productImageUrl = productImageUrl;
         this.purchasedAt = purchasedAt;
         this.registeredAt = LocalDateTime.now();
     }

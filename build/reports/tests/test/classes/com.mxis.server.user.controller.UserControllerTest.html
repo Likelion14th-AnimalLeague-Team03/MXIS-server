@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.030s</div>
+<div class="counter">0.028s</div>
 <p>duration</p>
 </div>
 </td>
@@ -99,12 +99,12 @@
 </tr>
 <tr>
 <td class="success">updateConsents_emptyList_returns400()</td>
-<td class="success">0.011s</td>
+<td class="success">0.010s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">updateConsents_success_returnsUpdatedList()</td>
-<td class="success">0.005s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -117,8 +117,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-17T06:52:04.752+09:00  INFO 5566 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T06:52:04.756+09:00  INFO 5566 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
+<pre>2026-08-17T15:46:53.520+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.user.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T15:46:53.526+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.user.controller.UserControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -129,21 +129,21 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T06:52:04.765+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 5566 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T06:52:04.765+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T06:52:04.765+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
-2026-08-17T06:52:04.849+09:00  WARN 5566 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T15:46:53.533+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Starting UserControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T15:46:53.533+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T15:46:53.534+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : The following 1 profile is active: &quot;local&quot;
+2026-08-17T15:46:53.622+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: c72a3284-e05b-4cfe-93f4-75cfb09d2dbb
+Using generated security password: 402387bb-a0fb-4f95-ab6c-8569a304d80a
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T06:52:04.850+09:00  INFO 5566 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T06:52:04.867+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T06:52:04.867+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T06:52:04.867+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T06:52:04.867+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T06:52:04.870+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.113 seconds (process running for 2.369)
+2026-08-17T15:46:53.622+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T15:46:53.642+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T15:46:53.642+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-17T15:46:53.644+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.u.controller.UserControllerTest    : Started UserControllerTest in 0.117 seconds (process running for 3.89)
 </pre>
 </span>
 </div>
@@ -155,7 +155,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오전 6:52:04</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 3:46:53</p>
 </div>
 </div>
 </body>

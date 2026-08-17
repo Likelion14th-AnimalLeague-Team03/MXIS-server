@@ -7,6 +7,7 @@ import com.mxis.server.care.repository.CareAlgorithmRepository;
 import com.mxis.server.care.repository.CareReportRepository;
 import com.mxis.server.care.repository.CareSuggestionRepository;
 import com.mxis.server.common.enums.CareConditionGrade;
+import com.mxis.server.notification.service.NotificationService;
 import com.mxis.server.product.entity.Product;
 import com.mxis.server.sensor.dto.SensorAggregate;
 import com.mxis.server.sensor.repository.SensorReadingRepository;
@@ -39,6 +40,7 @@ public class CareDiagnosisService {
     private final CareSuggestionRepository careSuggestionRepository;
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
+    private final NotificationService notificationService;
 
     /**
      * 진단 재계산. 센서 동기화 트랜잭션 안에서 호출되므로, 진단이 불가능한 상황(활성 알고리즘 없음,
@@ -102,7 +104,7 @@ public class CareDiagnosisService {
         LocalDate visitFrom = LocalDate.now().plusDays(4);
         LocalDate visitTo = visitFrom.plusMonths(1);
 
-        careSuggestionRepository.save(new CareSuggestion(
+        CareSuggestion suggestion = careSuggestionRepository.save(new CareSuggestion(
                 report,
                 product,
                 ruleEngine.suggestionMessage(grade),
@@ -111,6 +113,7 @@ public class CareDiagnosisService {
                 visitFrom,
                 visitTo,
                 visitTo.atTime(23, 59, 59)));
+        notificationService.createCareTimingNotificationIfNeeded(suggestion);
     }
 
     private static BigDecimal scale(Double value) {

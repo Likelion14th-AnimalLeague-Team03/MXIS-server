@@ -7,6 +7,7 @@ public record DeviceRegisterRequest(
         @NotBlank @Size(max = 100) String serialNumber,
         @Size(max = 50) String deviceName,
         @Size(max = 50) String macAddress,
-        @Size(max = 20) String firmwareVersion
+        @Size(max = 20) String firmwareVersion,
+        @Size(max = 500) String deviceImageUrl
 ) {
 }

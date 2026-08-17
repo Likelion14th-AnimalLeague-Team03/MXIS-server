@@ -9,6 +9,6 @@ public record ProductRecognizeResponse(
         String materialId,
         List<String> materialSubtypes,
         String color,
-        String imageUrl
+        String productImageUrl
 ) {
 }

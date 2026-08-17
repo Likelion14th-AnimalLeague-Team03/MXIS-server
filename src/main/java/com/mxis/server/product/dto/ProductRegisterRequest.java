@@ -12,7 +12,7 @@ public record ProductRegisterRequest(
         @NotBlank @Size(max = 50) String materialId,
         List<@Size(max = 50) String> materialSubtypes,
         @Size(max = 30) String color,
-        @Size(max = 500) String imageUrl,
+        @Size(max = 500) String productImageUrl,
         LocalDate purchasedAt
 ) {
 }

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,7 +59,12 @@ class ProductControllerTest {
 
     private ProductResponse sampleProduct() {
         return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
-                "https://example.com/image.png", LocalDate.of(2025, 1, 1), LocalDateTime.now());
+                "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), false);
+    }
+
+    private ProductResponse samplePrimaryProduct() {
+        return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
+                "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), true);
     }
 
     @Test
@@ -76,7 +82,7 @@ class ProductControllerTest {
         ProductRecognizeRequest request = new ProductRecognizeRequest("DPP-001");
         given(productService.recognize("DPP-001")).willReturn(new ProductRecognizeResponse(
                 "DPP-001", "트리케 백", "MODEL-A", "natural_leather", List.of(), "블랙",
-                "https://example.com/image.png"));
+                "https://example.com/product.png"));
 
         mockMvc.perform(post("/api/v1/products/recognize")
                         .header("Authorization", "Bearer " + accessToken)
@@ -158,6 +164,28 @@ class ProductControllerTest {
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error.code", is("PRODUCT_NOT_OWNED")));
+    }
+
+    @Test
+    void getPrimaryProduct_success_returnsProduct() throws Exception {
+        given(productService.getPrimaryProduct(eq(1L))).willReturn(samplePrimaryProduct());
+
+        mockMvc.perform(get("/api/v1/products/primary")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id", is(20)))
+                .andExpect(jsonPath("$.data.isPrimary", is(true)));
+    }
+
+    @Test
+    void setPrimaryProduct_success_returnsPrimaryProduct() throws Exception {
+        given(productService.setPrimaryProduct(eq(1L), eq(20L))).willReturn(samplePrimaryProduct());
+
+        mockMvc.perform(patch("/api/v1/products/20/primary")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id", is(20)))
+                .andExpect(jsonPath("$.data.isPrimary", is(true)));
     }
 
     @Test

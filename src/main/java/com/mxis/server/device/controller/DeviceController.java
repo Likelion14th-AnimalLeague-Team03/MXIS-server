@@ -2,6 +2,7 @@ package com.mxis.server.device.controller;
 
 import com.mxis.server.common.response.ApiResponse;
 import com.mxis.server.common.security.UserPrincipal;
+import com.mxis.server.device.dto.DeviceConnectionPolicyResponse;
 import com.mxis.server.device.dto.DeviceLookupResponse;
 import com.mxis.server.device.dto.DeviceRegisterRequest;
 import com.mxis.server.device.dto.DeviceResponse;
@@ -41,6 +42,11 @@ public class DeviceController {
     @GetMapping
     public ApiResponse<List<DeviceResponse>> getMyDevices(@AuthenticationPrincipal UserPrincipal principal) {
         return ApiResponse.ok(deviceService.getMyDevices(principal.userId()));
+    }
+
+    @GetMapping("/connection-policy")
+    public ApiResponse<DeviceConnectionPolicyResponse> getConnectionPolicy() {
+        return ApiResponse.ok(deviceService.getConnectionPolicy());
     }
 
     @GetMapping("/lookup")

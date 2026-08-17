@@ -45,6 +45,9 @@ public class Device extends BaseTimeEntity {
     @Column(name = "firmware_version", length = 20)
     private String firmwareVersion;
 
+    @Column(name = "device_image_url", length = 500)
+    private String deviceImageUrl;
+
     @Column(name = "battery_level")
     private Integer batteryLevel;
 
@@ -61,12 +64,14 @@ public class Device extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public Device(User user, String serialNumber, String deviceName, String macAddress, String firmwareVersion) {
+    public Device(User user, String serialNumber, String deviceName, String macAddress,
+                  String firmwareVersion, String deviceImageUrl) {
         this.user = user;
         this.serialNumber = serialNumber;
         this.deviceName = deviceName;
         this.macAddress = macAddress;
         this.firmwareVersion = firmwareVersion;
+        this.deviceImageUrl = deviceImageUrl;
         this.connectionStatus = DeviceConnectionStatus.DISCONNECTED;
         this.registeredAt = LocalDateTime.now();
     }

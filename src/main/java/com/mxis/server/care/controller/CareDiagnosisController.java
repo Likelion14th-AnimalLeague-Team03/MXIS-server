@@ -47,10 +47,7 @@ public class CareDiagnosisController {
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long id,
             @RequestParam String period) {
-        SensorPeriod parsed = SensorPeriod.fromCode(period);
-        if (parsed == null) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT, "period는 7D·30D·1Y 중 하나여야 합니다.");
-        }
+        SensorPeriod parsed = parsePeriod(period);
         return ApiResponse.ok(careQueryService.getSensorSummary(principal.userId(), id, parsed));
     }
 
@@ -59,5 +56,13 @@ public class CareDiagnosisController {
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long id) {
         return ApiResponse.ok(careSuggestionService.getActive(principal.userId(), id));
+    }
+
+    private SensorPeriod parsePeriod(String period) {
+        SensorPeriod parsed = SensorPeriod.fromCode(period);
+        if (parsed == null) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT, "period는 7D·30D·1Y 중 하나여야 합니다.");
+        }
+        return parsed;
     }
 }

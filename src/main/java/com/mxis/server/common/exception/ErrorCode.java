@@ -47,7 +47,10 @@ public enum ErrorCode {
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
     RESERVATION_NOT_OWNED(HttpStatus.FORBIDDEN, "본인의 예약이 아닙니다."),
     RESERVATION_NOT_MODIFIABLE(HttpStatus.CONFLICT, "취소되었거나 완료된 예약은 변경할 수 없습니다."),
-    SLOT_ALREADY_RESERVED(HttpStatus.CONFLICT, "이미 예약된 시간대입니다.");
+    SLOT_ALREADY_RESERVED(HttpStatus.CONFLICT, "이미 예약된 시간대입니다."),
+
+    // Notification
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림 정보를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String defaultMessage;

@@ -38,6 +38,13 @@ jwt:
   access-token-expire-ms: 3600000
   refresh-token-expire-ms: 1209600000
 
+mxis:
+  device:
+    ble:
+      allowed-service-uuids: ${MXIS_BLE_ALLOWED_SERVICE_UUIDS:0000fff0-0000-1000-8000-00805f9b34fb}
+      scan-timeout-seconds: ${MXIS_BLE_SCAN_TIMEOUT_SECONDS:10}
+      connect-timeout-seconds: ${MXIS_BLE_CONNECT_TIMEOUT_SECONDS:15}
+
 logging:
   level:
     com.mxis.server: DEBUG

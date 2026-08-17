@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,11 +47,23 @@ public class ProductController {
         return ApiResponse.ok(productService.getMyProducts(principal.userId()));
     }
 
+    @GetMapping("/primary")
+    public ApiResponse<ProductResponse> getPrimaryProduct(@AuthenticationPrincipal UserPrincipal principal) {
+        return ApiResponse.ok(productService.getPrimaryProduct(principal.userId()));
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<ProductResponse> getProduct(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long id) {
         return ApiResponse.ok(productService.getProduct(principal.userId(), id));
+    }
+
+    @PatchMapping("/{id}/primary")
+    public ApiResponse<ProductResponse> setPrimaryProduct(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id) {
+        return ApiResponse.ok(productService.setPrimaryProduct(principal.userId(), id));
     }
 
     @DeleteMapping("/{id}")

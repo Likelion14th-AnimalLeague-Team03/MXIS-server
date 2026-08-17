@@ -38,4 +38,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             ORDER BY r.reservedDate ASC, r.reservedTime ASC
             """)
     List<Reservation> findAllByUser(@Param("userId") Long userId, @Param("status") ReservationStatus status);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            JOIN FETCH r.user
+            JOIN FETCH r.product
+            JOIN FETCH r.store
+            WHERE r.status = com.mxis.server.common.enums.ReservationStatus.CONFIRMED
+              AND (r.reservedDate > :fromDate OR (r.reservedDate = :fromDate AND r.reservedTime >= :fromTime))
+              AND (r.reservedDate < :toDate OR (r.reservedDate = :toDate AND r.reservedTime < :toTime))
+            ORDER BY r.reservedDate ASC, r.reservedTime ASC
+            """)
+    List<Reservation> findConfirmedBetween(@Param("fromDate") LocalDate fromDate,
+                                           @Param("fromTime") LocalTime fromTime,
+                                           @Param("toDate") LocalDate toDate,
+                                           @Param("toTime") LocalTime toTime);
 }

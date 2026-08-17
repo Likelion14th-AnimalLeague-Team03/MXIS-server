@@ -2,12 +2,15 @@ package com.mxis.server.device.service;
 
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
+import com.mxis.server.device.config.DeviceConnectionProperties;
+import com.mxis.server.device.dto.DeviceConnectionPolicyResponse;
 import com.mxis.server.device.dto.DeviceLookupResponse;
 import com.mxis.server.device.dto.DeviceRegisterRequest;
 import com.mxis.server.device.dto.DeviceResponse;
 import com.mxis.server.device.dto.DeviceStatusUpdateRequest;
 import com.mxis.server.device.entity.Device;
 import com.mxis.server.device.repository.DeviceRepository;
+import com.mxis.server.notification.service.NotificationService;
 import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.user.entity.User;
@@ -25,6 +28,8 @@ public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
     private final ProductDeviceRepository productDeviceRepository;
+    private final DeviceConnectionProperties deviceConnectionProperties;
+    private final NotificationService notificationService;
 
     @Transactional
     public DeviceResponse register(Long userId, DeviceRegisterRequest request) {
@@ -40,7 +45,8 @@ public class DeviceService {
                 request.serialNumber(),
                 request.deviceName(),
                 request.macAddress(),
-                request.firmwareVersion());
+                request.firmwareVersion(),
+                request.deviceImageUrl());
 
         return DeviceResponse.from(deviceRepository.save(device));
     }
@@ -55,10 +61,15 @@ public class DeviceService {
         return DeviceResponse.from(getOwnedDevice(userId, deviceId));
     }
 
+    public DeviceConnectionPolicyResponse getConnectionPolicy() {
+        return DeviceConnectionPolicyResponse.from(deviceConnectionProperties);
+    }
+
     @Transactional
     public DeviceResponse updateStatus(Long userId, Long deviceId, DeviceStatusUpdateRequest request) {
         Device device = getOwnedDevice(userId, deviceId);
         device.updateStatus(request.connectionStatus(), request.batteryLevel(), null);
+        notificationService.createDeviceStatusNotificationIfNeeded(device);
         return DeviceResponse.from(device);
     }
 

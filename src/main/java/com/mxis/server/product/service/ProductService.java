@@ -43,24 +43,46 @@ public class ProductService {
                 request.materialId(),
                 request.materialSubtypes(),
                 request.color(),
-                request.imageUrl(),
+                request.productImageUrl(),
                 request.purchasedAt());
 
-        return ProductResponse.from(productRepository.save(product));
+        Product saved = productRepository.save(product);
+        return ProductResponse.from(saved, isPrimary(user, saved));
     }
 
     public List<ProductResponse> getMyProducts(Long userId) {
+        User user = getActiveUser(userId);
         return productRepository.findAllActiveByUserId(userId).stream()
-                .map(ProductResponse::from)
+                .map(product -> ProductResponse.from(product, isPrimary(user, product)))
                 .toList();
     }
 
     public ProductResponse getProduct(Long userId, Long productId) {
-        return ProductResponse.from(getOwnedProduct(userId, productId));
+        User user = getActiveUser(userId);
+        Product product = getOwnedProduct(userId, productId);
+        return ProductResponse.from(product, isPrimary(user, product));
+    }
+
+    public ProductResponse getPrimaryProduct(Long userId) {
+        User user = getActiveUser(userId);
+        Product primaryProduct = user.getPrimaryProduct();
+        if (primaryProduct == null || primaryProduct.isDeleted()) {
+            return null;
+        }
+        return ProductResponse.from(primaryProduct, true);
+    }
+
+    @Transactional
+    public ProductResponse setPrimaryProduct(Long userId, Long productId) {
+        User user = getActiveUser(userId);
+        Product product = getOwnedProduct(userId, productId);
+        user.changePrimaryProduct(product);
+        return ProductResponse.from(product, true);
     }
 
     @Transactional
     public void delete(Long userId, Long productId) {
+        User user = getActiveUser(userId);
         Product product = getOwnedProduct(userId, productId);
 
         // 제품을 삭제하면 연결돼 있던 기기들도 함께 연결 해제 처리한다 (detached_at 기록).
@@ -69,7 +91,17 @@ public class ProductService {
             link.detach();
         }
 
+        user.clearPrimaryProductIf(product);
         product.softDelete();
+    }
+
+    private User getActiveUser(Long userId) {
+        return userRepository.findActiveById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private boolean isPrimary(User user, Product product) {
+        return user.getPrimaryProduct() != null && user.getPrimaryProduct().getId().equals(product.getId());
     }
 
     Product getOwnedProduct(Long userId, Long productId) {

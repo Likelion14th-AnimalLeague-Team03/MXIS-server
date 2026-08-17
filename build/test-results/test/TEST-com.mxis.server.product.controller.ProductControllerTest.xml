@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.product.controller.ProductControllerTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-08-16T21:52:04" hostname="minuui-MacBookAir.local" time="0.04">
+<testsuite name="com.mxis.server.product.controller.ProductControllerTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-08-17T06:46:52" hostname="minuui-MacBookAir.local" time="0.04">
   <properties/>
   <testcase name="recognize_notRecognized_returns404()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.007"/>
-  <testcase name="recognize_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.001"/>
-  <testcase name="getProduct_notFound_returns404()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
-  <testcase name="register_success_returns201()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.011"/>
+  <testcase name="recognize_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
+  <testcase name="getProduct_notFound_returns404()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.003"/>
+  <testcase name="register_success_returns201()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.01"/>
   <testcase name="getProduct_notOwned_returns403()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.003"/>
-  <testcase name="register_blankProductName_returns400()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.003"/>
-  <testcase name="recognize_success_returnsProductInfo()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.004"/>
+  <testcase name="register_blankProductName_returns400()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
+  <testcase name="recognize_success_returnsProductInfo()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
   <testcase name="delete_success_returns204()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
+  <testcase name="getPrimaryProduct_success_returnsProduct()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
+  <testcase name="setPrimaryProduct_success_returnsPrimaryProduct()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.003"/>
   <testcase name="getMyProducts_success_returnsList()" classname="com.mxis.server.product.controller.ProductControllerTest" time="0.002"/>
-  <system-out><![CDATA[2026-08-17T06:52:04.331+09:00  INFO 5566 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.product.controller.ProductControllerTest]: ProductControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T06:52:04.337+09:00  INFO 5566 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.product.controller.ProductControllerTest
+  <system-out><![CDATA[2026-08-17T15:46:52.838+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.product.controller.ProductControllerTest]: ProductControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T15:46:52.843+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.product.controller.ProductControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -22,24 +24,24 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T06:52:04.346+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Starting ProductControllerTest using Java 17.0.17 with PID 5566 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T06:52:04.346+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T06:52:04.346+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : The following 1 profile is active: "local"
-2026-08-17T06:52:04.419+09:00  WARN 5566 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T15:46:52.850+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Starting ProductControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T15:46:52.850+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T15:46:52.850+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : The following 1 profile is active: "local"
+2026-08-17T15:46:52.923+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 27147f4b-de00-44ee-97bb-4aeced411cad
+Using generated security password: e3d1cff6-ac8d-47e6-9714-504ceea889ec
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T06:52:04.419+09:00  INFO 5566 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T06:52:04.440+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T06:52:04.440+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T06:52:04.440+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T06:52:04.441+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T06:52:04.445+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Started ProductControllerTest in 0.107 seconds (process running for 1.944)
-2026-08-17T06:52:04.451+09:00  WARN 5566 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: DPP 코드를 인식할 수 없습니다.
-2026-08-17T06:52:04.457+09:00  WARN 5566 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 제품 정보를 찾을 수 없습니다.
-2026-08-17T06:52:04.472+09:00  WARN 5566 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인 소유의 제품이 아닙니다.
+2026-08-17T15:46:52.923+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T15:46:52.945+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T15:46:52.945+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T15:46:52.945+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T15:46:52.945+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-17T15:46:52.948+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.p.c.ProductControllerTest          : Started ProductControllerTest in 0.104 seconds (process running for 3.194)
+2026-08-17T15:46:52.954+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: DPP 코드를 인식할 수 없습니다.
+2026-08-17T15:46:52.960+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 제품 정보를 찾을 수 없습니다.
+2026-08-17T15:46:52.973+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인 소유의 제품이 아닙니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

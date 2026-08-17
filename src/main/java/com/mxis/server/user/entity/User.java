@@ -2,13 +2,17 @@ package com.mxis.server.user.entity;
 
 import com.mxis.server.common.entity.BaseTimeEntity;
 import com.mxis.server.common.enums.AuthProvider;
+import com.mxis.server.product.entity.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -44,6 +48,10 @@ public class User extends BaseTimeEntity {
     @Column(length = 20)
     private String phone;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_product_id")
+    private Product primaryProduct;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -70,6 +78,16 @@ public class User extends BaseTimeEntity {
         }
         if (phone != null) {
             this.phone = phone;
+        }
+    }
+
+    public void changePrimaryProduct(Product product) {
+        this.primaryProduct = product;
+    }
+
+    public void clearPrimaryProductIf(Product product) {
+        if (this.primaryProduct != null && this.primaryProduct.getId().equals(product.getId())) {
+            this.primaryProduct = null;
         }
     }
 

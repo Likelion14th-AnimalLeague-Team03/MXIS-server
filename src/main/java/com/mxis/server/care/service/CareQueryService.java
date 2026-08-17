@@ -1,6 +1,8 @@
 package com.mxis.server.care.service;
 
+import com.mxis.server.care.dto.AiCareSummaryResponse;
 import com.mxis.server.care.dto.CareDashboardResponse;
+import com.mxis.server.care.dto.CareEnvironmentResponse;
 import com.mxis.server.care.dto.CareReportResponse;
 import com.mxis.server.care.dto.SensorPeriod;
 import com.mxis.server.care.dto.SensorSummaryResponse;
@@ -20,11 +22,16 @@ import com.mxis.server.sensor.repository.SensorReadingRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +43,8 @@ public class CareQueryService {
 
     private static final int DRY_EXPOSURE_DAYS = 7;
     private static final int MONTHS_PER_YEAR = 12;
+    private static final long MIN_VALID_READING_COUNT = 24;
+    private static final double MIN_COVERAGE_HOURS = 24.0;
 
     private final ProductRepository productRepository;
     private final ProductDeviceRepository productDeviceRepository;
@@ -43,6 +52,80 @@ public class CareQueryService {
     private final CareSuggestionRepository careSuggestionRepository;
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
+
+    public AiCareSummaryResponse getAiCareSummary(Long userId, Long productId, SensorPeriod period) {
+        getOwnedProduct(userId, productId);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime from = now.minusDays(period.days());
+        SensorAggregate aggregate = aggregate(productId, from, now);
+        ReadingStats stats = readingStats(productId, from, now);
+        AiCareSummaryResponse.DataSufficiency dataSufficiency = dataSufficiency(stats);
+
+        StressDecision stress = stressDecision(aggregate);
+        boolean sufficient = "SUFFICIENT".equals(dataSufficiency.status());
+        Integer score = sufficient ? score(stress) : null;
+        String label = sufficient ? conditionLabel(score) : "Collecting Data";
+        String primaryFactor = sufficient ? primaryFactor(stress) : null;
+        String summary = sufficient
+                ? summaryText(stress)
+                : "제품 상태 분석을 위해 데이터를 수집하고 있습니다.";
+
+        return new AiCareSummaryResponse(
+                productId,
+                now,
+                period.days(),
+                dataSufficiency,
+                new AiCareSummaryResponse.ProductCondition(label, score, primaryFactor, summary),
+                new AiCareSummaryResponse.StressLabels(
+                        stress.humidity(),
+                        stress.temperatureHeat(),
+                        stress.dryness(),
+                        stress.handling(),
+                        "LOW",
+                        "UNKNOWN"),
+                new AiCareSummaryResponse.Explanation(
+                        summary,
+                        explanationBullets(sufficient, stress),
+                        List.of(
+                                "MVP 센서는 UV/light를 직접 측정하지 않습니다.",
+                                "표면 손상, 곰팡이, 균열은 센서만으로 확정하지 않습니다.")),
+                new AiCareSummaryResponse.CopyGeneration(
+                        "deterministic_fallback",
+                        null,
+                        null));
+    }
+
+    public CareEnvironmentResponse getCareEnvironment(Long userId, Long productId, SensorPeriod period) {
+        getOwnedProduct(userId, productId);
+
+        LocalDateTime now = LocalDateTime.now();
+        Window window = environmentWindow(period, now);
+        SensorAggregate aggregate = aggregate(productId, window.from(), window.to());
+        AiCareSummaryResponse.DataSufficiency dataSufficiency =
+                dataSufficiency(readingStats(productId, window.from(), window.to()));
+        StressDecision stress = stressDecision(aggregate);
+
+        return new CareEnvironmentResponse(
+                productId,
+                period,
+                now,
+                dataSufficiency,
+                new CareEnvironmentResponse.EnvironmentSummary(
+                        scale(aggregate.avgTemperature()),
+                        scale(aggregate.avgHumidity()),
+                        stress.humidity(),
+                        stress.temperatureHeat(),
+                        stress.dryness(),
+                        stress.handling(),
+                        "UNKNOWN"),
+                environmentPoints(productId, period, window),
+                new CareEnvironmentResponse.EnvironmentCopy(
+                        "그래프의 순간값보다 안정 범위를 벗어난 누적 시간이 관리 판단에 더 중요합니다.",
+                        List.of(
+                                "7D는 일일 평균 7개, 30D는 3일 평균 10개, 1Y는 월 평균 12개로 구성됩니다.",
+                                "현재 센서는 UV/light와 표면 증상을 직접 측정하지 않습니다.")));
+    }
 
     public CareDashboardResponse getDashboard(Long userId, Long productId) {
         Product product = getOwnedProduct(userId, productId);
@@ -56,8 +139,8 @@ public class CareQueryService {
 
         return new CareDashboardResponse(
                 new CareDashboardResponse.ProductSummary(
-                        product.getId(), product.getProductName(), product.getMaterial(),
-                        product.getColor(), product.getImageUrl()),
+                        product.getId(), product.getProductName(), product.getMaterialId(),
+                        product.getColor(), product.getProductImageUrl()),
                 new CareDashboardResponse.DeviceSummary(
                         primaryDevice == null ? null : primaryDevice.getConnectionStatus(),
                         primaryDevice == null ? null : primaryDevice.getLastSyncedAt()),
@@ -145,6 +228,234 @@ public class CareQueryService {
     private SensorAggregate aggregate(Long productId, LocalDateTime from, LocalDateTime to) {
         return sensorReadingRepository.aggregate(
                 productId, from, to, CareRuleEngine.DRY_THRESHOLD, CareRuleEngine.STRONG_SHOCK_THRESHOLD);
+    }
+
+    private ReadingStats readingStats(Long productId, LocalDateTime from, LocalDateTime to) {
+        Object[] row = sensorReadingRepository.findReadingStats(productId, from, to);
+        long count = row[0] == null ? 0L : ((Number) row[0]).longValue();
+        LocalDateTime firstMeasuredAt = toLocalDateTime(row[1]);
+        LocalDateTime lastMeasuredAt = toLocalDateTime(row[2]);
+        LocalDateTime lastSyncedAt = toLocalDateTime(row[3]);
+        Double coverageHours = firstMeasuredAt == null || lastMeasuredAt == null
+                ? 0.0
+                : ChronoUnit.MINUTES.between(firstMeasuredAt, lastMeasuredAt) / 60.0;
+        return new ReadingStats(count, coverageHours, lastMeasuredAt, lastSyncedAt);
+    }
+
+    private AiCareSummaryResponse.DataSufficiency dataSufficiency(ReadingStats stats) {
+        String status = "SUFFICIENT";
+        String reason = null;
+        if (stats.validReadingCount() == 0) {
+            status = "NO_DATA";
+            reason = "NO_VALID_READING";
+        } else if (stats.validReadingCount() < MIN_VALID_READING_COUNT) {
+            status = "INSUFFICIENT_DATA";
+            reason = "MIN_READING_COUNT_NOT_MET";
+        } else if (stats.coverageHours() < MIN_COVERAGE_HOURS) {
+            status = "INSUFFICIENT_DATA";
+            reason = "MIN_COVERAGE_HOURS_NOT_MET";
+        }
+        return new AiCareSummaryResponse.DataSufficiency(
+                status,
+                reason,
+                stats.validReadingCount(),
+                BigDecimal.valueOf(stats.coverageHours()).setScale(1, RoundingMode.HALF_UP).doubleValue(),
+                stats.lastMeasuredAt(),
+                stats.lastSyncedAt());
+    }
+
+    private StressDecision stressDecision(SensorAggregate aggregate) {
+        BigDecimal avgHumidity = scale(aggregate.avgHumidity());
+        BigDecimal avgTemperature = scale(aggregate.avgTemperature());
+        String humidity = avgHumidity == null ? "UNKNOWN"
+                : avgHumidity.compareTo(BigDecimal.valueOf(80)) >= 0 ? "ELEVATED"
+                : avgHumidity.compareTo(BigDecimal.valueOf(65)) >= 0 ? "CAUTION"
+                : "LOW";
+        String temperatureHeat = avgTemperature == null ? "UNKNOWN"
+                : avgTemperature.compareTo(BigDecimal.valueOf(30)) >= 0 ? "CAUTION"
+                : "LOW";
+        String dryness = aggregate.dryRatio() >= 0.2 ? "CAUTION" : "LOW";
+        String handling = aggregate.shockCountAsInt() >= 3 ? "CAUTION" : "LOW";
+        return new StressDecision(humidity, temperatureHeat, dryness, handling);
+    }
+
+    private Integer score(StressDecision stress) {
+        int score = 100;
+        score -= stressPenalty(stress.humidity());
+        score -= stressPenalty(stress.temperatureHeat());
+        score -= stressPenalty(stress.dryness());
+        score -= stressPenalty(stress.handling());
+        return Math.max(score, 0);
+    }
+
+    private int stressPenalty(String stress) {
+        return switch (stress) {
+            case "CAUTION" -> 8;
+            case "ELEVATED" -> 18;
+            case "HIGH" -> 35;
+            case "INSPECTION_REQUIRED" -> 50;
+            default -> 0;
+        };
+    }
+
+    private String conditionLabel(int score) {
+        if (score >= 85) {
+            return "Excellent";
+        }
+        if (score >= 60) {
+            return "Standard";
+        }
+        return "Needs Attention";
+    }
+
+    private String primaryFactor(StressDecision stress) {
+        if (!"LOW".equals(stress.humidity()) && !"UNKNOWN".equals(stress.humidity())) {
+            return "humidity";
+        }
+        if (!"LOW".equals(stress.temperatureHeat()) && !"UNKNOWN".equals(stress.temperatureHeat())) {
+            return "temperature_heat";
+        }
+        if (!"LOW".equals(stress.dryness())) {
+            return "dryness";
+        }
+        if (!"LOW".equals(stress.handling())) {
+            return "handling";
+        }
+        return null;
+    }
+
+    private String summaryText(StressDecision stress) {
+        String primaryFactor = primaryFactor(stress);
+        if (primaryFactor == null) {
+            return "현재 제공된 센서 데이터 기준으로 보관 환경은 대체로 안정적입니다.";
+        }
+        return switch (primaryFactor) {
+            case "humidity" -> "최근 습도가 안정 범위를 벗어난 시간이 있어 보관 환경 조정이 권장됩니다.";
+            case "temperature_heat" -> "최근 온도 노출이 높게 감지되어 열원과의 거리를 확인하는 것이 좋습니다.";
+            case "dryness" -> "건조 노출이 누적되어 과도한 제습이나 건조한 보관 환경을 피하는 것이 좋습니다.";
+            case "handling" -> "움직임 또는 충격 노출이 일부 감지되어 보관 위치를 확인하는 것이 좋습니다.";
+            default -> "현재 센서 데이터 기준으로 예방 관리가 권장됩니다.";
+        };
+    }
+
+    private List<String> explanationBullets(boolean sufficient, StressDecision stress) {
+        if (!sufficient) {
+            return List.of(
+                    "최소 분석 기준을 채우려면 유효한 센서 데이터가 더 필요합니다.",
+                    "데이터가 충분히 쌓이면 온습도와 움직임 노출을 함께 해석합니다.");
+        }
+        List<String> bullets = new ArrayList<>();
+        if (!"LOW".equals(stress.humidity()) && !"UNKNOWN".equals(stress.humidity())) {
+            bullets.add("제공된 센서 데이터 기준으로 습도가 안정 범위를 벗어난 시간이 확인되었습니다.");
+        }
+        if (!"LOW".equals(stress.temperatureHeat()) && !"UNKNOWN".equals(stress.temperatureHeat())) {
+            bullets.add("온도 노출은 손상 확정이 아니라 보관 환경 점검을 위한 신호로 해석합니다.");
+        }
+        if (!"LOW".equals(stress.handling())) {
+            bullets.add("IMU 데이터는 표면 손상 판단이 아니라 움직임/취급 노출의 참고 신호입니다.");
+        }
+        if (bullets.isEmpty()) {
+            bullets.add("현재 데이터 기준으로 안정 범위를 크게 벗어난 누적 노출은 확인되지 않았습니다.");
+        }
+        bullets.add("현재 점검이 필요한 표면 증상은 센서만으로 판단하지 않습니다.");
+        return bullets;
+    }
+
+    private Window environmentWindow(SensorPeriod period, LocalDateTime now) {
+        if (period == SensorPeriod.ONE_YEAR) {
+            LocalDate firstDayOfThisMonth = YearMonth.from(now).atDay(1);
+            LocalDate from = firstDayOfThisMonth.minusMonths(11);
+            LocalDate to = firstDayOfThisMonth.plusMonths(1);
+            return new Window(from.atStartOfDay(), to.atStartOfDay());
+        }
+
+        LocalDate to = now.toLocalDate().plusDays(1);
+        LocalDate from = to.minusDays(period.days());
+        return new Window(from.atStartOfDay(), to.atStartOfDay());
+    }
+
+    private List<CareEnvironmentResponse.EnvironmentPoint> environmentPoints(
+            Long productId, SensorPeriod period, Window window) {
+        if (period == SensorPeriod.SEVEN_DAYS) {
+            return dailyEnvironmentPoints(sensorReadingRepository.findDailyEnvironment(
+                    productId, window.from(), window.to()), window.from().toLocalDate());
+        }
+        if (period == SensorPeriod.THIRTY_DAYS) {
+            return threeDayEnvironmentPoints(sensorReadingRepository.findThreeDayEnvironment(
+                    productId, window.from(), window.to()), window.from().toLocalDate());
+        }
+        return monthlyEnvironmentPoints(sensorReadingRepository.findMonthlyEnvironment(
+                productId, window.from(), window.to()), window.from().toLocalDate());
+    }
+
+    private List<CareEnvironmentResponse.EnvironmentPoint> dailyEnvironmentPoints(List<Object[]> rows, LocalDate start) {
+        Map<LocalDate, EnvAggregate> byDate = new HashMap<>();
+        for (Object[] row : rows) {
+            byDate.put(((Date) row[0]).toLocalDate(), envAggregate(row[1], row[2], row[3]));
+        }
+
+        List<CareEnvironmentResponse.EnvironmentPoint> points = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            LocalDate day = start.plusDays(i);
+            EnvAggregate aggregate = byDate.getOrDefault(day, EnvAggregate.empty());
+            points.add(new CareEnvironmentResponse.EnvironmentPoint(
+                    day.toString(), day, day, aggregate.avgTemperature(), aggregate.avgHumidity(), aggregate.readingCount()));
+        }
+        return points;
+    }
+
+    private List<CareEnvironmentResponse.EnvironmentPoint> threeDayEnvironmentPoints(List<Object[]> rows, LocalDate start) {
+        Map<Integer, EnvAggregate> byBucket = new HashMap<>();
+        for (Object[] row : rows) {
+            int bucket = ((Number) row[0]).intValue();
+            byBucket.put(bucket, envAggregate(row[1], row[2], row[3]));
+        }
+
+        List<CareEnvironmentResponse.EnvironmentPoint> points = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            LocalDate from = start.plusDays((long) i * 3);
+            LocalDate to = from.plusDays(2);
+            EnvAggregate aggregate = byBucket.getOrDefault(i, EnvAggregate.empty());
+            points.add(new CareEnvironmentResponse.EnvironmentPoint(
+                    "%s~%s".formatted(from, to), from, to,
+                    aggregate.avgTemperature(), aggregate.avgHumidity(), aggregate.readingCount()));
+        }
+        return points;
+    }
+
+    private List<CareEnvironmentResponse.EnvironmentPoint> monthlyEnvironmentPoints(List<Object[]> rows, LocalDate start) {
+        Map<LocalDate, EnvAggregate> byMonth = new HashMap<>();
+        for (Object[] row : rows) {
+            byMonth.put(((Date) row[0]).toLocalDate(), envAggregate(row[1], row[2], row[3]));
+        }
+
+        List<CareEnvironmentResponse.EnvironmentPoint> points = new ArrayList<>();
+        for (int i = 0; i < MONTHS_PER_YEAR; i++) {
+            LocalDate month = start.plusMonths(i);
+            LocalDate to = month.plusMonths(1).minusDays(1);
+            EnvAggregate aggregate = byMonth.getOrDefault(month, EnvAggregate.empty());
+            points.add(new CareEnvironmentResponse.EnvironmentPoint(
+                    YearMonth.from(month).toString(), month, to,
+                    aggregate.avgTemperature(), aggregate.avgHumidity(), aggregate.readingCount()));
+        }
+        return points;
+    }
+
+    private EnvAggregate envAggregate(Object avgTemperature, Object avgHumidity, Object readingCount) {
+        return new EnvAggregate(
+                avgTemperature == null ? null : BigDecimal.valueOf(((Number) avgTemperature).doubleValue()).setScale(1, RoundingMode.HALF_UP),
+                avgHumidity == null ? null : BigDecimal.valueOf(((Number) avgHumidity).doubleValue()).setScale(1, RoundingMode.HALF_UP),
+                readingCount == null ? 0L : ((Number) readingCount).longValue());
+    }
+
+    private LocalDateTime toLocalDateTime(Object value) {
+        if (value instanceof Timestamp timestamp) {
+            return timestamp.toLocalDateTime();
+        }
+        if (value instanceof LocalDateTime localDateTime) {
+            return localDateTime;
+        }
+        return null;
     }
 
     /**
@@ -260,5 +571,34 @@ public class CareQueryService {
 
     private static BigDecimal scale(Double value) {
         return value == null ? null : BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP);
+    }
+
+    private record ReadingStats(
+            long validReadingCount,
+            double coverageHours,
+            LocalDateTime lastMeasuredAt,
+            LocalDateTime lastSyncedAt
+    ) {
+    }
+
+    private record StressDecision(
+            String humidity,
+            String temperatureHeat,
+            String dryness,
+            String handling
+    ) {
+    }
+
+    private record Window(LocalDateTime from, LocalDateTime to) {
+    }
+
+    private record EnvAggregate(
+            BigDecimal avgTemperature,
+            BigDecimal avgHumidity,
+            long readingCount
+    ) {
+        private static EnvAggregate empty() {
+            return new EnvAggregate(null, null, 0);
+        }
     }
 }

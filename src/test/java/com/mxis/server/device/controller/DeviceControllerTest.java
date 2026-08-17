@@ -59,12 +59,15 @@ class DeviceControllerTest {
 
     private DeviceResponse sampleDevice() {
         return new DeviceResponse(10L, "SN-001", "내 가방 참", "AA:BB:CC:DD:EE:FF", "1.0.0",
-                80, DeviceConnectionStatus.CONNECTED, LocalDateTime.now(), LocalDateTime.now());
+                "https://example.com/device.png", 80,
+                DeviceConnectionStatus.CONNECTED, LocalDateTime.now(), LocalDateTime.now());
     }
 
     @Test
     void register_success_returns201() throws Exception {
-        DeviceRegisterRequest request = new DeviceRegisterRequest("SN-001", "내 가방 참", "AA:BB:CC:DD:EE:FF", "1.0.0");
+        DeviceRegisterRequest request = new DeviceRegisterRequest(
+                "SN-001", "내 가방 참", "AA:BB:CC:DD:EE:FF", "1.0.0",
+                "https://example.com/device.png");
         given(deviceService.register(eq(1L), any(DeviceRegisterRequest.class))).willReturn(sampleDevice());
 
         mockMvc.perform(post("/api/v1/devices")
@@ -77,7 +80,7 @@ class DeviceControllerTest {
 
     @Test
     void register_blankSerialNumber_returns400() throws Exception {
-        DeviceRegisterRequest request = new DeviceRegisterRequest("", null, null, null);
+        DeviceRegisterRequest request = new DeviceRegisterRequest("", null, null, null, null);
 
         mockMvc.perform(post("/api/v1/devices")
                         .header("Authorization", "Bearer " + accessToken)
@@ -89,7 +92,7 @@ class DeviceControllerTest {
 
     @Test
     void register_alreadyRegistered_returns409() throws Exception {
-        DeviceRegisterRequest request = new DeviceRegisterRequest("SN-001", null, null, null);
+        DeviceRegisterRequest request = new DeviceRegisterRequest("SN-001", null, null, null, null);
         given(deviceService.register(eq(1L), any(DeviceRegisterRequest.class)))
                 .willThrow(new BusinessException(ErrorCode.DEVICE_ALREADY_REGISTERED));
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.sensor.controller.SensorReadingControllerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-08-16T21:52:04" hostname="minuui-MacBookAir.local" time="0.031">
+<testsuite name="com.mxis.server.sensor.controller.SensorReadingControllerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-08-17T06:46:53" hostname="minuui-MacBookAir.local" time="0.028">
   <properties/>
-  <testcase name="syncBatch_emptyReadings_returns400()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.017"/>
-  <testcase name="syncBatch_deviceNotLinked_returns409()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.006"/>
-  <testcase name="syncBatch_success_returns201()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.005"/>
-  <testcase name="syncBatch_withoutToken_returns401()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.001"/>
-  <system-out><![CDATA[2026-08-17T06:52:04.621+09:00  INFO 5566 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.sensor.controller.SensorReadingControllerTest]: SensorReadingControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T06:52:04.628+09:00  INFO 5566 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.sensor.controller.SensorReadingControllerTest
+  <testcase name="syncBatch_emptyReadings_returns400()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.016"/>
+  <testcase name="syncBatch_deviceNotLinked_returns409()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.005"/>
+  <testcase name="syncBatch_success_returns201()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.004"/>
+  <testcase name="syncBatch_withoutToken_returns401()" classname="com.mxis.server.sensor.controller.SensorReadingControllerTest" time="0.002"/>
+  <system-out><![CDATA[2026-08-17T15:46:53.271+09:00  INFO 71628 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.sensor.controller.SensorReadingControllerTest]: SensorReadingControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-17T15:46:53.276+09:00  INFO 71628 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.sensor.controller.SensorReadingControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -17,22 +17,22 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T06:52:04.635+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Starting SensorReadingControllerTest using Java 17.0.17 with PID 5566 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T06:52:04.635+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T06:52:04.635+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : The following 1 profile is active: "local"
-2026-08-17T06:52:04.698+09:00  WARN 5566 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-17T15:46:53.282+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Starting SensorReadingControllerTest using Java 17.0.17 with PID 71628 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-17T15:46:53.282+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-17T15:46:53.282+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : The following 1 profile is active: "local"
+2026-08-17T15:46:53.344+09:00  WARN 71628 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: cf8ec14f-c24d-4812-baf7-609aedd9968e
+Using generated security password: 16ee33cb-5ed7-46dd-9e07-a65d993f6e28
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T06:52:04.698+09:00  INFO 5566 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T06:52:04.716+09:00 DEBUG 5566 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T06:52:04.716+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T06:52:04.716+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T06:52:04.716+09:00  INFO 5566 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T06:52:04.719+09:00  INFO 5566 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Started SensorReadingControllerTest in 0.089 seconds (process running for 2.218)
-2026-08-17T06:52:04.741+09:00  WARN 5566 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기가 아직 제품에 연결되지 않아 센서 데이터를 저장할 수 없습니다.
+2026-08-17T15:46:53.345+09:00  INFO 71628 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-17T15:46:53.365+09:00 DEBUG 71628 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-17T15:46:53.365+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-17T15:46:53.365+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-17T15:46:53.365+09:00  INFO 71628 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-17T15:46:53.368+09:00  INFO 71628 --- [mxis-server] [    Test worker] c.m.s.s.c.SensorReadingControllerTest    : Started SensorReadingControllerTest in 0.09 seconds (process running for 3.614)
+2026-08-17T15:46:53.389+09:00  WARN 71628 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기가 아직 제품에 연결되지 않아 센서 데이터를 저장할 수 없습니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

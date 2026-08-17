@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - CareRuleEngineTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>CareRuleEngineTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.mxis.server.care.service.html">com.mxis.server.care.service</a> &gt; CareRuleEngineTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">36</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.012s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">[10] humidity=HUMID_RISK, shock=LOW, expected=LIGHT_CARE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[10]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[11] humidity=DRY_RISK, shock=HIGH, expected=EXPERT_CHECK</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[11]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[12] humidity=HUMID_RISK, shock=HIGH, expected=EXPERT_CHECK</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[12]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] humidity=IDEAL, shock=LOW, expected=STABLE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[1]</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] humidity=IDEAL, shock=MEDIUM, expected=BALANCED</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[2]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] humidity=SLIGHTLY_DRY, shock=LOW, expected=BALANCED</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[3]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] humidity=SLIGHTLY_DRY, shock=MEDIUM, expected=BALANCED</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[4]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] humidity=SLIGHTLY_HUMID, shock=MEDIUM, expected=BALANCED</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[5]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[6] humidity=SLIGHTLY_DRY, shock=HIGH, expected=LIGHT_CARE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[6]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[7] humidity=SLIGHTLY_HUMID, shock=HIGH, expected=LIGHT_CARE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[7]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[8] humidity=DRY_RISK, shock=LOW, expected=LIGHT_CARE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[8]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[9] humidity=DRY_RISK, shock=MEDIUM, expected=LIGHT_CARE</td>
+<td class="success">conditionGrade_followsSpecMapping(HumidityGrade, ShockGrade, CareConditionGrade)[9]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">conditionGrade_idealHumidityDoesNotCancelHighShock()</td>
+<td class="success">conditionGrade_idealHumidityDoesNotCancelHighShock()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] ratio=0.0, expected=짧음</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[1]</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] ratio=0.19, expected=짧음</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[2]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] ratio=0.2, expected=보통</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[3]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] ratio=0.49, expected=보통</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[4]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] ratio=0.5, expected=잦음</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[5]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[6] ratio=1.0, expected=잦음</td>
+<td class="success">dryExposureLabel_boundaries(double, String)[6]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] humidity=25.0, expected=DRY_RISK</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[1]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] humidity=29.9, expected=DRY_RISK</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[2]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] humidity=30.0, expected=SLIGHTLY_DRY</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[3]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] humidity=39.9, expected=SLIGHTLY_DRY</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[4]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] humidity=40.0, expected=IDEAL</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[5]</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[6] humidity=60.0, expected=IDEAL</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[6]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[7] humidity=60.1, expected=SLIGHTLY_HUMID</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[7]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[8] humidity=70.0, expected=SLIGHTLY_HUMID</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[8]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[9] humidity=70.1, expected=HUMID_RISK</td>
+<td class="success">humidityGrade_boundaries(String, HumidityGrade)[9]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">humidityGrade_nullTreatedAsIdeal()</td>
+<td class="success">humidityGrade_nullTreatedAsIdeal()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">needsSuggestion_onlyForLightCareAndAbove()</td>
+<td class="success">needsSuggestion_onlyForLightCareAndAbove()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] count=0, expected=LOW</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[1]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] count=3, expected=LOW</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[2]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[3] count=4, expected=MEDIUM</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[3]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[4] count=10, expected=MEDIUM</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[4]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[5] count=11, expected=HIGH</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[5]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[6] count=50, expected=HIGH</td>
+<td class="success">shockGrade_boundaries(int, ShockGrade)[6]</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 3:46:53</p>
+</div>
+</div>
+</body>
+</html>

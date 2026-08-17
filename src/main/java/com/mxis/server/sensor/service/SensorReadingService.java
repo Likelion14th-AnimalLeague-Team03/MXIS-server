@@ -5,6 +5,7 @@ import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.entity.Device;
 import com.mxis.server.device.repository.DeviceRepository;
+import com.mxis.server.notification.service.NotificationService;
 import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.sensor.dto.SensorReadingBatchRequest;
@@ -28,6 +29,7 @@ public class SensorReadingService {
     private final DeviceRepository deviceRepository;
     private final ProductDeviceRepository productDeviceRepository;
     private final CareDiagnosisService careDiagnosisService;
+    private final NotificationService notificationService;
 
     @Transactional
     public SensorReadingBatchResponse syncBatch(Long userId, Long deviceId, SensorReadingBatchRequest request) {
@@ -78,6 +80,7 @@ public class SensorReadingService {
         // ponytail: 같은 트랜잭션에서 동기 처리. 배치가 커져 응답이 느려지면 @Async로 분리한다.
         sensorReadingRepository.flush();
         careDiagnosisService.regenerate(link.getProduct());
+        notificationService.createEnvironmentAlertIfNeeded(link.getProduct(), toSave);
 
         return new SensorReadingBatchResponse(
                 request.readings().size(),

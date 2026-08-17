@@ -6,7 +6,7 @@ spring:
     active: local
 
   datasource:
-    url: jdbc:mariadb://localhost:3306/mxis?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    url: ${DB_URL:jdbc:mariadb://localhost:3306/mxis?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul}
     username: ${DB_USERNAME:mxis}
     password: ${DB_PASSWORD:mxis}
     driver-class-name: org.mariadb.jdbc.Driver
@@ -35,8 +35,15 @@ springdoc:
 
 jwt:
   secret: ${JWT_SECRET:change-this-secret-key-in-production-min-32-bytes-long}
-  access-token-expire-ms: 3600000        # 1시간
-  refresh-token-expire-ms: 1209600000    # 14일
+  access-token-expire-ms: 3600000
+  refresh-token-expire-ms: 1209600000
+
+mxis:
+  device:
+    ble:
+      allowed-service-uuids: ${MXIS_BLE_ALLOWED_SERVICE_UUIDS:0000fff0-0000-1000-8000-00805f9b34fb}
+      scan-timeout-seconds: ${MXIS_BLE_SCAN_TIMEOUT_SECONDS:10}
+      connect-timeout-seconds: ${MXIS_BLE_CONNECT_TIMEOUT_SECONDS:15}
 
 logging:
   level:

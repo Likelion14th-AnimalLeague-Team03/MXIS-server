@@ -79,4 +79,66 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     List<Object[]> findMonthlyHumidity(@Param("productId") Long productId,
                                        @Param("from") LocalDateTime from,
                                        @Param("to") LocalDateTime to);
+
+    /** AI base API 데이터 충분성 판단용: [COUNT, MIN(measured_at), MAX(measured_at), MAX(synced_at)]. */
+    @Query(value = """
+            SELECT COUNT(*) AS reading_count,
+                   MIN(measured_at) AS first_measured_at,
+                   MAX(measured_at) AS last_measured_at,
+                   MAX(synced_at) AS last_synced_at
+            FROM sensor_readings
+            WHERE product_id = :productId
+              AND measured_at >= :from AND measured_at < :to
+            """, nativeQuery = true)
+    Object[] findReadingStats(@Param("productId") Long productId,
+                              @Param("from") LocalDateTime from,
+                              @Param("to") LocalDateTime to);
+
+    /** 환경 그래프용 일별 평균. 각 행은 [java.sql.Date, Number, Number, Number]. */
+    @Query(value = """
+            SELECT DATE(measured_at) AS bucket_day,
+                   AVG(temperature) AS avg_temperature,
+                   AVG(humidity) AS avg_humidity,
+                   COUNT(*) AS reading_count
+            FROM sensor_readings
+            WHERE product_id = :productId
+              AND measured_at >= :from AND measured_at < :to
+            GROUP BY DATE(measured_at)
+            ORDER BY bucket_day
+            """, nativeQuery = true)
+    List<Object[]> findDailyEnvironment(@Param("productId") Long productId,
+                                        @Param("from") LocalDateTime from,
+                                        @Param("to") LocalDateTime to);
+
+    /** 환경 그래프용 3일 버킷 평균. 각 행은 [Number bucket_index, Number, Number, Number]. */
+    @Query(value = """
+            SELECT FLOOR(DATEDIFF(DATE(measured_at), DATE(:from)) / 3) AS bucket_index,
+                   AVG(temperature) AS avg_temperature,
+                   AVG(humidity) AS avg_humidity,
+                   COUNT(*) AS reading_count
+            FROM sensor_readings
+            WHERE product_id = :productId
+              AND measured_at >= :from AND measured_at < :to
+            GROUP BY bucket_index
+            ORDER BY bucket_index
+            """, nativeQuery = true)
+    List<Object[]> findThreeDayEnvironment(@Param("productId") Long productId,
+                                           @Param("from") LocalDateTime from,
+                                           @Param("to") LocalDateTime to);
+
+    /** 환경 그래프용 월별 평균. 각 행은 [java.sql.Date, Number, Number, Number]. */
+    @Query(value = """
+            SELECT CAST(DATE_FORMAT(measured_at, '%Y-%m-01') AS DATE) AS bucket_month,
+                   AVG(temperature) AS avg_temperature,
+                   AVG(humidity) AS avg_humidity,
+                   COUNT(*) AS reading_count
+            FROM sensor_readings
+            WHERE product_id = :productId
+              AND measured_at >= :from AND measured_at < :to
+            GROUP BY bucket_month
+            ORDER BY bucket_month
+            """, nativeQuery = true)
+    List<Object[]> findMonthlyEnvironment(@Param("productId") Long productId,
+                                          @Param("from") LocalDateTime from,
+                                          @Param("to") LocalDateTime to);
 }
