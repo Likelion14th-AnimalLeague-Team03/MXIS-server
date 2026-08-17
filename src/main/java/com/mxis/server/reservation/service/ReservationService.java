@@ -55,7 +55,8 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(
                 user, product, store, suggestion,
-                request.serviceType(), request.reservedDate(), request.reservedTime(), request.customerNote());
+                request.serviceType(), request.reservationType(),
+                request.reservedDate(), request.reservedTime(), request.customerNote());
 
         save(reservation);
 

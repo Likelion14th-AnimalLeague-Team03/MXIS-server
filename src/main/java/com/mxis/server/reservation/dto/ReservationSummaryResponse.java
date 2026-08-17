@@ -2,6 +2,7 @@ package com.mxis.server.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mxis.server.common.enums.ReservationStatus;
+import com.mxis.server.common.enums.ReservationType;
 import com.mxis.server.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,6 +14,7 @@ public record ReservationSummaryResponse(
         String productName,
         Long storeId,
         String storeName,
+        ReservationType reservationType,
         LocalDate reservedDate,
         @JsonFormat(pattern = "HH:mm") LocalTime reservedTime,
         ReservationStatus status
@@ -24,6 +26,7 @@ public record ReservationSummaryResponse(
                 r.getProduct().getProductName(),
                 r.getStore().getId(),
                 r.getStore().getStoreName(),
+                r.getReservationType(),
                 r.getReservedDate(),
                 r.getReservedTime(),
                 r.getStatus());
