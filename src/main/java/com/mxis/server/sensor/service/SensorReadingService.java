@@ -1,10 +1,13 @@
 package com.mxis.server.sensor.service;
 
 import com.mxis.server.care.service.CareDiagnosisService;
+import com.mxis.server.care.service.CareRuleEngine;
+import com.mxis.server.common.enums.NotificationType;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.entity.Device;
 import com.mxis.server.device.repository.DeviceRepository;
+import com.mxis.server.notification.service.PushNotificationService;
 import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.sensor.dto.SensorReadingBatchRequest;
@@ -28,6 +31,8 @@ public class SensorReadingService {
     private final DeviceRepository deviceRepository;
     private final ProductDeviceRepository productDeviceRepository;
     private final CareDiagnosisService careDiagnosisService;
+    private final CareRuleEngine ruleEngine;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public SensorReadingBatchResponse syncBatch(Long userId, Long deviceId, SensorReadingBatchRequest request) {
@@ -77,11 +82,25 @@ public class SensorReadingService {
         // ponytail: 같은 트랜잭션에서 동기 처리. 배치가 커져 응답이 느려지면 @Async로 분리한다.
         sensorReadingRepository.flush();
         careDiagnosisService.regenerate(link.getProduct());
+        notifyIfEnvironmentRisk(link.getProduct().getUser().getId(), toSave);
 
         return new SensorReadingBatchResponse(
                 request.readings().size(),
                 toSave.size(),
                 existing.size(),
                 syncedAt);
+    }
+
+    /** 배치 안에 위험(건조/습함) 등급 측정치가 하나라도 있으면 1건만 알린다 — 측정마다 보내면 스팸이 된다. */
+    private void notifyIfEnvironmentRisk(Long userId, List<SensorReading> batch) {
+        batch.stream()
+                .map(SensorReading::getHumidity)
+                .filter(java.util.Objects::nonNull)
+                .map(ruleEngine::humidityGrade)
+                .filter(grade -> grade == CareRuleEngine.HumidityGrade.DRY_RISK
+                        || grade == CareRuleEngine.HumidityGrade.HUMID_RISK)
+                .findFirst()
+                .ifPresent(grade -> pushNotificationService.notifyUser(userId, NotificationType.ENVIRONMENT_ALERT,
+                        "보관 환경을 확인해 주세요", grade.label()));
     }
 }

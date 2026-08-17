@@ -2,9 +2,11 @@ package com.mxis.server.reservation.service;
 
 import com.mxis.server.care.entity.CareSuggestion;
 import com.mxis.server.care.repository.CareSuggestionRepository;
+import com.mxis.server.common.enums.NotificationType;
 import com.mxis.server.common.enums.ReservationStatus;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
+import com.mxis.server.notification.service.PushNotificationService;
 import com.mxis.server.product.entity.Product;
 import com.mxis.server.product.repository.ProductRepository;
 import com.mxis.server.reservation.dto.ReservationCancelResponse;
@@ -39,6 +41,7 @@ public class ReservationService {
     private final StoreRepository storeRepository;
     private final CareSuggestionRepository careSuggestionRepository;
     private final UserRepository userRepository;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public ReservationResponse create(Long userId, ReservationCreateRequest request) {
@@ -55,7 +58,8 @@ public class ReservationService {
 
         Reservation reservation = new Reservation(
                 user, product, store, suggestion,
-                request.serviceType(), request.reservedDate(), request.reservedTime(), request.customerNote());
+                request.serviceType(), request.reservationType(),
+                request.reservedDate(), request.reservedTime(), request.customerNote());
 
         save(reservation);
 
@@ -63,6 +67,10 @@ public class ReservationService {
         if (suggestion != null) {
             suggestion.markReserved();
         }
+
+        pushNotificationService.notifyUser(userId, NotificationType.RESERVATION,
+                "예약이 확정됐어요", "%s %s %s 방문 예약이 확정되었습니다.".formatted(
+                        store.getStoreName(), reservation.getReservedDate(), reservation.getReservedTime()));
 
         return ReservationResponse.from(reservation);
     }

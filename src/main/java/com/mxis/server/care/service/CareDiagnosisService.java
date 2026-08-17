@@ -7,6 +7,8 @@ import com.mxis.server.care.repository.CareAlgorithmRepository;
 import com.mxis.server.care.repository.CareReportRepository;
 import com.mxis.server.care.repository.CareSuggestionRepository;
 import com.mxis.server.common.enums.CareConditionGrade;
+import com.mxis.server.common.enums.NotificationType;
+import com.mxis.server.notification.service.PushNotificationService;
 import com.mxis.server.product.entity.Product;
 import com.mxis.server.sensor.dto.SensorAggregate;
 import com.mxis.server.sensor.repository.SensorReadingRepository;
@@ -39,6 +41,7 @@ public class CareDiagnosisService {
     private final CareSuggestionRepository careSuggestionRepository;
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
+    private final PushNotificationService pushNotificationService;
 
     /**
      * 진단 재계산. 센서 동기화 트랜잭션 안에서 호출되므로, 진단이 불가능한 상황(활성 알고리즘 없음,
@@ -92,6 +95,9 @@ public class CareDiagnosisService {
         if (ruleEngine.needsSuggestion(grade)) {
             createSuggestion(product, report, grade);
         }
+
+        pushNotificationService.notifyUser(product.getUser().getId(), NotificationType.CARE_TIMING,
+                "케어 진단이 업데이트됐어요", ruleEngine.summaryText(grade));
     }
 
     private void createSuggestion(Product product, CareReport report, CareConditionGrade grade) {

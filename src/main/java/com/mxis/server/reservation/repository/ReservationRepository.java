@@ -5,11 +5,19 @@ import com.mxis.server.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+
+    /** 메인 홈 "다가오는 예약" 카드용 — 해당 제품의 가장 가까운 확정 예약 1건. */
+    Optional<Reservation> findFirstByProductIdAndStatusAndReservedDateGreaterThanEqualOrderByReservedDateAscReservedTimeAsc(
+            Long productId, ReservationStatus status, LocalDate today);
+
+    /** 예약 리마인드 배치용 — 특정 날짜에 방문 예정인 확정 예약 전체. */
+    List<Reservation> findAllByReservedDateAndStatus(LocalDate reservedDate, ReservationStatus status);
 
     /** 해당 매장/날짜에 이미 확정되어 슬롯을 점유 중인 시각들. */
     @Query("""

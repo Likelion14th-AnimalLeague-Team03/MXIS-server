@@ -1,5 +1,7 @@
 package com.mxis.server.device.service;
 
+import com.mxis.server.common.enums.DeviceConnectionStatus;
+import com.mxis.server.common.enums.NotificationType;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.dto.DeviceLookupResponse;
@@ -8,6 +10,7 @@ import com.mxis.server.device.dto.DeviceResponse;
 import com.mxis.server.device.dto.DeviceStatusUpdateRequest;
 import com.mxis.server.device.entity.Device;
 import com.mxis.server.device.repository.DeviceRepository;
+import com.mxis.server.notification.service.PushNotificationService;
 import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.user.entity.User;
@@ -22,9 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DeviceService {
 
+    // ponytail: 배터리 부족 알림 임계값. 실측 후 조정 필요한 캘리브레이션 값.
+    private static final int LOW_BATTERY_THRESHOLD = 20;
+
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
     private final ProductDeviceRepository productDeviceRepository;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public DeviceResponse register(Long userId, DeviceRegisterRequest request) {
@@ -59,7 +66,20 @@ public class DeviceService {
     public DeviceResponse updateStatus(Long userId, Long deviceId, DeviceStatusUpdateRequest request) {
         Device device = getOwnedDevice(userId, deviceId);
         device.updateStatus(request.connectionStatus(), request.batteryLevel(), null);
+        notifyIfNeedsAttention(userId, device, request);
         return DeviceResponse.from(device);
+    }
+
+    /** 연결 끊김/오류 또는 배터리 부족으로 전환됐을 때만 알림 — 매 상태 갱신마다 보내면 스팸이 된다. */
+    private void notifyIfNeedsAttention(Long userId, Device device, DeviceStatusUpdateRequest request) {
+        if (request.connectionStatus() == DeviceConnectionStatus.DISCONNECTED
+                || request.connectionStatus() == DeviceConnectionStatus.ERROR) {
+            pushNotificationService.notifyUser(userId, NotificationType.DEVICE_STATUS,
+                    "MXIS Charm 연결이 끊겼어요", "%s 연결을 다시 확인해 주세요.".formatted(device.getDeviceName()));
+        } else if (request.batteryLevel() != null && request.batteryLevel() <= LOW_BATTERY_THRESHOLD) {
+            pushNotificationService.notifyUser(userId, NotificationType.DEVICE_STATUS,
+                    "배터리가 부족해요", "%s 배터리가 %d%% 남았어요.".formatted(device.getDeviceName(), request.batteryLevel()));
+        }
     }
 
     /**

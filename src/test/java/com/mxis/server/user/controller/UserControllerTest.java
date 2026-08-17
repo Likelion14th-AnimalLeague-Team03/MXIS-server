@@ -127,7 +127,7 @@ class UserControllerTest {
     @Test
     void getNotificationSettings_success() throws Exception {
         given(notificationSettingService.get(eq(1L)))
-                .willReturn(new NotificationSettingResponse(true, true, true, false, true));
+                .willReturn(new NotificationSettingResponse(true, true, true, false, true, true));
 
         mockMvc.perform(get("/api/v1/users/me/notification-settings")
                         .header("Authorization", "Bearer " + accessToken))
@@ -138,9 +138,9 @@ class UserControllerTest {
     @Test
     void updateNotificationSettings_success() throws Exception {
         NotificationSettingUpdateRequest request =
-                new NotificationSettingUpdateRequest(false, null, null, null, null, null);
+                new NotificationSettingUpdateRequest(false, null, null, null, null, null, null);
         given(notificationSettingService.update(eq(1L), any(NotificationSettingUpdateRequest.class)))
-                .willReturn(new NotificationSettingResponse(false, true, true, false, true));
+                .willReturn(new NotificationSettingResponse(false, true, true, false, true, true));
 
         mockMvc.perform(patch("/api/v1/users/me/notification-settings")
                         .header("Authorization", "Bearer " + accessToken)

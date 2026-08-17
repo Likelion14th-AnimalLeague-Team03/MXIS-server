@@ -3,6 +3,7 @@ package com.mxis.server.reservation.entity;
 import com.mxis.server.care.entity.CareSuggestion;
 import com.mxis.server.common.entity.BaseTimeEntity;
 import com.mxis.server.common.enums.ReservationStatus;
+import com.mxis.server.common.enums.ReservationType;
 import com.mxis.server.product.entity.Product;
 import com.mxis.server.store.entity.Store;
 import com.mxis.server.user.entity.User;
@@ -58,6 +59,10 @@ public class Reservation extends BaseTimeEntity {
     @Column(name = "service_type", length = 100)
     private String serviceType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reservation_type", nullable = false, length = 10)
+    private ReservationType reservationType;
+
     @Column(name = "reserved_date", nullable = false)
     private LocalDate reservedDate;
 
@@ -78,12 +83,14 @@ public class Reservation extends BaseTimeEntity {
     private LocalDateTime completedAt;
 
     public Reservation(User user, Product product, Store store, CareSuggestion careSuggestion,
-                       String serviceType, LocalDate reservedDate, LocalTime reservedTime, String customerNote) {
+                       String serviceType, ReservationType reservationType,
+                       LocalDate reservedDate, LocalTime reservedTime, String customerNote) {
         this.user = user;
         this.product = product;
         this.store = store;
         this.careSuggestion = careSuggestion;
         this.serviceType = serviceType;
+        this.reservationType = reservationType;
         this.reservedDate = reservedDate;
         this.reservedTime = reservedTime;
         this.customerNote = customerNote;

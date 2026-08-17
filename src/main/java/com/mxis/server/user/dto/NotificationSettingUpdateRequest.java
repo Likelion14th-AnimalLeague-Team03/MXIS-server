@@ -5,6 +5,7 @@ public record NotificationSettingUpdateRequest(
         Boolean reservationEnabled,
         Boolean deviceStatusEnabled,
         Boolean marketingEnabled,
+        Boolean environmentAlertEnabled,
         Boolean pushPermissionGranted,
         String pushToken
 ) {

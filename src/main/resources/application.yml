@@ -38,6 +38,10 @@ jwt:
   access-token-expire-ms: 3600000
   refresh-token-expire-ms: 1209600000
 
+fcm:
+  # FCM(Firebase Cloud Messaging) 서비스 계정 키 JSON 경로. 미설정 시 푸시 발송은 조용히 비활성화된다.
+  credentials-path: ${FCM_CREDENTIALS_PATH:}
+
 logging:
   level:
     com.mxis.server: DEBUG

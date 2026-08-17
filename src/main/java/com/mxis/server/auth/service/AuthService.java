@@ -13,6 +13,7 @@ import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.common.security.JwtTokenProvider;
 import com.mxis.server.common.security.UserPrincipal;
+import com.mxis.server.user.dto.UserResponse;
 import com.mxis.server.user.entity.NotificationSetting;
 import com.mxis.server.user.entity.User;
 import com.mxis.server.user.repository.NotificationSettingRepository;
@@ -128,6 +129,6 @@ public class AuthService {
     private TokenResponse issueTokens(User user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getEmail());
-        return TokenResponse.of(accessToken, refreshToken);
+        return TokenResponse.of(accessToken, refreshToken, UserResponse.from(user));
     }
 }
