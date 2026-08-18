@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.care.controller.CareBaseControllerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-08-17T09:15:53" hostname="minuui-MacBookAir.local" time="0.042">
+<testsuite name="com.mxis.server.care.controller.CareBaseControllerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-08-18T15:10:06" hostname="minuui-MacBookAir.local" time="0.132">
   <properties/>
-  <testcase name="getAiCareSummary_success_returnsAiContractFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.014"/>
-  <testcase name="getDiagnosisHome_success_returnsScreenFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.006"/>
-  <testcase name="getReport_success_returnsCareNeedAndCycleFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.004"/>
-  <testcase name="getCareEnvironment_invalidPeriod_returns400()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.003"/>
-  <testcase name="getCareEnvironment_thirtyDays_returnsThreeDayAveragePoints()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.006"/>
-  <testcase name="getGuide_success_returnsGuideImageAndSteps()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.003"/>
-  <testcase name="getEnvironmentOverview_success_returnsAllPeriods()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.004"/>
-  <system-out><![CDATA[2026-08-17T18:15:53.308+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.care.controller.CareBaseControllerTest]: CareBaseControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T18:15:53.318+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.care.controller.CareBaseControllerTest
+  <testcase name="getAiCareSummary_success_returnsAiContractFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.025"/>
+  <testcase name="getDiagnosisHome_success_returnsScreenFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.041"/>
+  <testcase name="getReport_success_returnsCareNeedAndCycleFields()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.007"/>
+  <testcase name="getCareEnvironment_invalidPeriod_returns400()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.005"/>
+  <testcase name="getCareEnvironment_thirtyDays_returnsThreeDayAveragePoints()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.012"/>
+  <testcase name="getGuide_success_returnsGuideImageAndSteps()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.012"/>
+  <testcase name="getEnvironmentOverview_success_returnsAllPeriods()" classname="com.mxis.server.care.controller.CareBaseControllerTest" time="0.008"/>
+  <system-out><![CDATA[2026-08-19T00:10:06.678+09:00  INFO 48901 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.care.controller.CareBaseControllerTest]: CareBaseControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-19T00:10:06.691+09:00  INFO 48901 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.care.controller.CareBaseControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -20,22 +20,22 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T18:15:53.331+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Starting CareBaseControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T18:15:53.331+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T18:15:53.331+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : The following 1 profile is active: "local"
-2026-08-17T18:15:53.446+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-19T00:10:06.709+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Starting CareBaseControllerTest using Java 17.0.17 with PID 48901 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-19T00:10:06.709+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-19T00:10:06.709+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : The following 1 profile is active: "local"
+2026-08-19T00:10:06.903+09:00  WARN 48901 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 72f86257-341f-4b3b-8687-980078bf7022
+Using generated security password: ba8ed006-73b1-4cf5-bb3a-9fb581c65d14
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T18:15:53.446+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T18:15:53.474+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T18:15:53.474+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T18:15:53.474+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T18:15:53.474+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T18:15:53.477+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Started CareBaseControllerTest in 0.157 seconds (process running for 1.732)
-2026-08-17T18:15:53.505+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: period는 7D·30D·1Y 중 하나여야 합니다.
+2026-08-19T00:10:06.903+09:00  INFO 48901 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-19T00:10:06.945+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-19T00:10:06.946+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-19T00:10:06.946+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-19T00:10:06.946+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-19T00:10:06.951+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareBaseControllerTest         : Started CareBaseControllerTest in 0.258 seconds (process running for 2.429)
+2026-08-19T00:10:07.030+09:00  WARN 48901 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: period는 7D·30D·1Y 중 하나여야 합니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

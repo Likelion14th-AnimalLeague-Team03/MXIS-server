@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.016s</div>
+<div class="counter">0.018s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,12 +79,12 @@
 </thead>
 <tr>
 <td class="success">getAvailableTimes_missingDate_returns400()</td>
-<td class="success">0.005s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">getAvailableTimes_storeNotFound_returns404()</td>
-<td class="success">0.002s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -112,8 +112,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-17T18:15:54.811+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.store.controller.StoreControllerTest]: StoreControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T18:15:54.816+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.store.controller.StoreControllerTest
+<pre>2026-08-19T00:10:09.602+09:00  INFO 48901 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.store.controller.StoreControllerTest]: StoreControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-19T00:10:09.608+09:00  INFO 48901 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.store.controller.StoreControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -124,22 +124,22 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T18:15:54.822+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Starting StoreControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T18:15:54.822+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T18:15:54.822+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : The following 1 profile is active: &quot;local&quot;
-2026-08-17T18:15:54.882+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-19T00:10:09.615+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Starting StoreControllerTest using Java 17.0.17 with PID 48901 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-19T00:10:09.615+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-19T00:10:09.615+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : The following 1 profile is active: &quot;local&quot;
+2026-08-19T00:10:09.686+09:00  WARN 48901 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: c5c6d118-9fa2-45a5-a2e1-16809796b6a3
+Using generated security password: bfbe2375-1e06-4e05-9ca9-035a49e727ed
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T18:15:54.882+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T18:15:54.900+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T18:15:54.900+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T18:15:54.901+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T18:15:54.901+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T18:15:54.903+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Started StoreControllerTest in 0.086 seconds (process running for 3.158)
-2026-08-17T18:15:54.915+09:00  WARN 15030 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 매장 정보를 찾을 수 없습니다.
+2026-08-19T00:10:09.687+09:00  INFO 48901 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-19T00:10:09.709+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-19T00:10:09.709+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-19T00:10:09.709+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-19T00:10:09.709+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-19T00:10:09.711+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.s.controller.StoreControllerTest   : Started StoreControllerTest in 0.102 seconds (process running for 5.189)
+2026-08-19T00:10:09.724+09:00  WARN 48901 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 매장 정보를 찾을 수 없습니다.
 </pre>
 </span>
 </div>
@@ -151,7 +151,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 17. 오후 6:15:55</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 19. 오전 12:10:10</p>
 </div>
 </div>
 </body>
