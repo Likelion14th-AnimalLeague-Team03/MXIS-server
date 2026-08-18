@@ -40,6 +40,14 @@ jwt:
 
 mxis:
   ai:
+    service:
+      enabled: ${MXIS_AI_SERVICE_ENABLED:false}
+      base-url: ${MXIS_AI_SERVICE_BASE_URL:http://127.0.0.1:8765}
+      timeout-seconds: ${MXIS_AI_SERVICE_TIMEOUT_SECONDS:45}
+      internal-api-key: ${MXIS_AI_INTERNAL_API_KEY:}
+      llm-enabled: ${MXIS_USE_OPENAI:false}
+      model: ${OPENAI_MODEL:gpt-5-mini}
+
     openai:
       enabled: ${MXIS_USE_OPENAI:false}
       api-key: ${OPENAI_API_KEY:}

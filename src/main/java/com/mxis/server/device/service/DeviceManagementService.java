@@ -4,6 +4,7 @@ import com.mxis.server.care.dto.ScreenProductSummary;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.dto.management.DeviceManagementSummaryResponse;
+import com.mxis.server.device.dto.management.ProductDeviceManagementSummaryResponse;
 import com.mxis.server.device.entity.Device;
 import com.mxis.server.product.entity.Product;
 import com.mxis.server.product.entity.ProductDevice;
@@ -51,6 +52,39 @@ public class DeviceManagementService {
                 sensorReadingRepository.countTotalOutingSessions(primaryProduct.getId()),
                 primaryLink == null ? null : primaryDevice(primaryLink.getDevice()),
                 latestReading == null ? null : currentEnvironment(latestReading));
+    }
+
+    public ProductDeviceManagementSummaryResponse getProductSummary(Long userId, Long productId) {
+        User user = userRepository.findActiveById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        Product product = productRepository.findActiveById(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+        if (!product.isOwnedBy(userId)) {
+            throw new BusinessException(ErrorCode.PRODUCT_NOT_OWNED);
+        }
+
+        List<ProductDevice> activeLinks = productDeviceRepository.findActiveByProductId(productId);
+        SensorReading latestReading = sensorReadingRepository
+                .findFirstByProductIdOrderByMeasuredAtDesc(productId)
+                .orElse(null);
+        List<ProductDeviceManagementSummaryResponse.ConnectedDevice> connectedDevices = activeLinks.stream()
+                .map(ProductDeviceManagementSummaryResponse.ConnectedDevice::from)
+                .toList();
+        ProductDeviceManagementSummaryResponse.ConnectedDevice primaryDevice = activeLinks.stream()
+                .filter(ProductDevice::isPrimary)
+                .findFirst()
+                .map(ProductDeviceManagementSummaryResponse.ConnectedDevice::from)
+                .orElse(null);
+
+        boolean isPrimary = user.getPrimaryProduct() != null
+                && user.getPrimaryProduct().getId().equals(product.getId());
+
+        return new ProductDeviceManagementSummaryResponse(
+                ProductDeviceManagementSummaryResponse.ProductSummary.from(product, isPrimary),
+                latestReading == null ? null : ProductDeviceManagementSummaryResponse.CurrentEnvironment.from(latestReading),
+                sensorReadingRepository.countTotalOutingSessions(productId),
+                primaryDevice,
+                connectedDevices);
     }
 
     private List<DeviceManagementSummaryResponse.ProductImage> productImages(List<Product> products) {

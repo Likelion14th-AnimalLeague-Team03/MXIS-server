@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.notification.controller.NotificationControllerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-08-17T09:15:54" hostname="minuui-MacBookAir.local" time="0.016">
+<testsuite name="com.mxis.server.notification.controller.NotificationControllerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-08-18T15:10:08" hostname="minuui-MacBookAir.local" time="0.028">
   <properties/>
-  <testcase name="getNotification_success_returnsDetail()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.005"/>
-  <testcase name="getNotifications_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.002"/>
-  <testcase name="getNotifications_success_returnsPagedList()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.003"/>
-  <testcase name="unreadCount_success_returnsCount()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.002"/>
-  <testcase name="markRead_success_returnsReadResult()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.003"/>
-  <testcase name="markAllRead_success_returnsUnreadCount()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.001"/>
-  <system-out><![CDATA[2026-08-17T18:15:54.094+09:00  INFO 15030 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.notification.controller.NotificationControllerTest]: NotificationControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-17T18:15:54.099+09:00  INFO 15030 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.notification.controller.NotificationControllerTest
+  <testcase name="getNotification_success_returnsDetail()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.008"/>
+  <testcase name="getNotifications_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.003"/>
+  <testcase name="getNotifications_success_returnsPagedList()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.005"/>
+  <testcase name="unreadCount_success_returnsCount()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.004"/>
+  <testcase name="markRead_success_returnsReadResult()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.004"/>
+  <testcase name="markAllRead_success_returnsUnreadCount()" classname="com.mxis.server.notification.controller.NotificationControllerTest" time="0.004"/>
+  <system-out><![CDATA[2026-08-19T00:10:08.652+09:00  INFO 48901 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.notification.controller.NotificationControllerTest]: NotificationControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-19T00:10:08.661+09:00  INFO 48901 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.notification.controller.NotificationControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -19,21 +19,21 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-17T18:15:54.106+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Starting NotificationControllerTest using Java 17.0.17 with PID 15030 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-17T18:15:54.106+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-17T18:15:54.106+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : The following 1 profile is active: "local"
-2026-08-17T18:15:54.173+09:00  WARN 15030 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-19T00:10:08.670+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Starting NotificationControllerTest using Java 17.0.17 with PID 48901 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-19T00:10:08.670+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-19T00:10:08.670+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : The following 1 profile is active: "local"
+2026-08-19T00:10:08.770+09:00  WARN 48901 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 429eeb4e-2b65-442c-8087-b5736b7d05ac
+Using generated security password: e6058d63-0996-466e-a3bc-46957ecc443d
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-17T18:15:54.174+09:00  INFO 15030 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-17T18:15:54.193+09:00 DEBUG 15030 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-17T18:15:54.193+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-17T18:15:54.193+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-17T18:15:54.193+09:00  INFO 15030 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-17T18:15:54.195+09:00  INFO 15030 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Started NotificationControllerTest in 0.095 seconds (process running for 2.45)
+2026-08-19T00:10:08.770+09:00  INFO 48901 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-19T00:10:08.799+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-19T00:10:08.799+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-19T00:10:08.799+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-19T00:10:08.799+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-19T00:10:08.802+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.n.c.NotificationControllerTest     : Started NotificationControllerTest in 0.14 seconds (process running for 4.28)
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
