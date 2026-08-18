@@ -52,6 +52,9 @@ public class Store extends BaseTimeEntity {
     @Column(name = "opening_hours", length = 255)
     private String openingHours;
 
+    @Column(name = "store_url", length = 500)
+    private String storeUrl;
+
     @Column(name = "open_time", nullable = false)
     private LocalTime openTime;
 

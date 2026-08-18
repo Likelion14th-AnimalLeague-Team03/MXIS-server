@@ -17,10 +17,10 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "http://10.0.2.2:*"));
+        // 로컬 개발 전용. 휴대폰 등 같은 와이파이의 다른 기기가 노트북 LAN IP로 접속해도
+        // 막히지 않도록 origin을 전부 허용한다 (JWT는 헤더로만 오가고 allowCredentials=false라
+        // 와일드카드 origin이어도 자격증명 탈취 리스크 없음). 운영 배포 전 제거 대상.
+        configuration.setAllowedOriginPatterns(List.of("http://*:*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(false);

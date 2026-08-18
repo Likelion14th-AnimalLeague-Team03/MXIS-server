@@ -11,6 +11,7 @@ public record StoreResponse(
         BigDecimal latitude,
         BigDecimal longitude,
         String openingHours,
+        String storeUrl,
         BigDecimal distanceKm
 ) {
     public static StoreResponse from(Store store, BigDecimal distanceKm) {
@@ -22,6 +23,7 @@ public record StoreResponse(
                 store.getLatitude(),
                 store.getLongitude(),
                 store.getOpeningHours(),
+                store.getStoreUrl(),
                 distanceKm);
     }
 }
