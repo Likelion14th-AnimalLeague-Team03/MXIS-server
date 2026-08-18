@@ -34,6 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CareScreenService {
 
+    private static final String CARE_TYPE_VENTILATED_SHADE_STORAGE = "ventilated_shade_storage";
+    private static final String CARE_TYPE_DRY_SOFT_CLOTH_WIPE = "dry_soft_cloth_wipe";
+
     private final ProductRepository productRepository;
     private final CareReportRepository careReportRepository;
     private final CareGuideRepository careGuideRepository;
@@ -96,16 +99,22 @@ public class CareScreenService {
 
     public CareGuideResponse getGuide(Long userId, Long productId) {
         Product product = getOwnedProduct(userId, productId);
-        CareGuide guide = findGuide(product);
+        CareReport report = latestReportOrNull(productId);
+        JsonNode ai = report == null ? null : aiCareSummary(report);
+        String careType = careType(ai, product);
+        CareGuide guide = findGuide(careType, product);
+        JsonNode aiCareGuide = path(ai, "llmCopy", "careGuide");
+
         return new CareGuideResponse(
                 product.getId(),
                 product.getMaterialId(),
                 product.getMaterialDisplayName(),
+                careType,
                 guide.getGuideImageUrl(),
                 guide.getTitle(),
-                guide.getDescription(),
-                guide.getSteps(),
-                guide.getTip());
+                firstText(path(aiCareGuide, "description"), textNode(guide.getDescription()), null),
+                firstList(path(aiCareGuide, "steps"), guide.getSteps()),
+                firstText(path(aiCareGuide, "tip"), path(aiCareGuide, "weeklyTip"), textNode(guide.getTip())));
     }
 
     private CareEnvironmentOverviewResponse.PeriodEnvironment periodEnvironment(
@@ -136,7 +145,12 @@ public class CareScreenService {
                 interpretation(period, aggregate, outingCount, shockCount));
     }
 
-    private CareGuide findGuide(Product product) {
+    private CareGuide findGuide(String careType, Product product) {
+        CareGuide typeGuide = careGuideRepository.findFirstByCareTypeAndActiveTrue(careType).orElse(null);
+        if (typeGuide != null) {
+            return typeGuide;
+        }
+
         List<String> subtypes = product.getMaterialSubtypes() == null ? List.of() : product.getMaterialSubtypes();
         for (String subtype : subtypes) {
             CareGuide subtypeGuide = careGuideRepository
@@ -148,6 +162,25 @@ public class CareScreenService {
         }
         return careGuideRepository.findFirstByMaterialIdAndMaterialSubtypeIsNullAndActiveTrue(product.getMaterialId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "관리 가이드를 찾을 수 없습니다."));
+    }
+
+    private String careType(JsonNode ai, Product product) {
+        String explicitCareType = text(path(ai, "llmCopy", "careGuide", "careType"));
+        if (CARE_TYPE_VENTILATED_SHADE_STORAGE.equals(explicitCareType)
+                || CARE_TYPE_DRY_SOFT_CLOTH_WIPE.equals(explicitCareType)) {
+            return explicitCareType;
+        }
+
+        String primaryFactor = text(path(ai, "productCondition", "primaryFactor"));
+        if ("temperature_heat".equals(primaryFactor)
+                || "humidity".equals(primaryFactor)
+                || "dryness".equals(primaryFactor)) {
+            return CARE_TYPE_VENTILATED_SHADE_STORAGE;
+        }
+        if ("natural_leather".equals(product.getMaterialId())) {
+            return CARE_TYPE_VENTILATED_SHADE_STORAGE;
+        }
+        return CARE_TYPE_DRY_SOFT_CLOTH_WIPE;
     }
 
     private String interpretation(SensorPeriod period, SensorAggregate aggregate, int outingCount, int shockCount) {
@@ -169,6 +202,10 @@ public class CareScreenService {
     private CareReport latestReport(Long productId) {
         return careReportRepository.findFirstByProductIdOrderByCreatedAtDesc(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NO_DIAGNOSIS_DATA));
+    }
+
+    private CareReport latestReportOrNull(Long productId) {
+        return careReportRepository.findFirstByProductIdOrderByCreatedAtDesc(productId).orElse(null);
     }
 
     private JsonNode aiCareSummary(CareReport report) {
@@ -311,6 +348,14 @@ public class CareScreenService {
                 .filter(JsonNode::isTextual)
                 .map(JsonNode::asText)
                 .toList();
+    }
+
+    private List<String> firstList(JsonNode node, List<String> fallback) {
+        List<String> values = stringList(node);
+        if (!values.isEmpty()) {
+            return values;
+        }
+        return fallback == null ? List.of() : fallback;
     }
 
     private static int orZero(Integer value) {

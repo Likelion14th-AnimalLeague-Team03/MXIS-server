@@ -200,8 +200,9 @@ class CareBaseControllerTest {
                 20L,
                 "canvas",
                 "Visetos Canvas",
+                "dry_soft_cloth_wipe",
                 "http://161.33.38.65:8080/images/canvas.png",
-                "마른 부드러운 천으로 표면 정돈",
+                "이번 주에는 마른 부드러운 천으로 표면을 정돈해주세요",
                 "먼지와 오염을 부드럽게 제거하여 가죽의 컨디션을 유지해 주세요.",
                 List.of("마른 부드러운 천을 준비해주세요.", "결 방향을 따라 부드럽게 닦아주세요."),
                 "정기적으로 관리하면 가죽의 광택과 수명을 오래 유지할 수 있어요."));
@@ -209,7 +210,9 @@ class CareBaseControllerTest {
         mockMvc.perform(get("/api/v1/care/products/20/guide")
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.careType", is("dry_soft_cloth_wipe")))
                 .andExpect(jsonPath("$.data.guideImageUrl", is("http://161.33.38.65:8080/images/canvas.png")))
+                .andExpect(jsonPath("$.data.title", is("이번 주에는 마른 부드러운 천으로 표면을 정돈해주세요")))
                 .andExpect(jsonPath("$.data.materialDisplayName", is("Visetos Canvas")))
                 .andExpect(jsonPath("$.data.steps[0]", is("마른 부드러운 천을 준비해주세요.")));
     }

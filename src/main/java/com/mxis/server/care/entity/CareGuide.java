@@ -30,6 +30,9 @@ public class CareGuide extends BaseTimeEntity {
     @Column(name = "material_subtype", length = 50)
     private String materialSubtype;
 
+    @Column(name = "care_type", length = 50)
+    private String careType;
+
     @Column(name = "guide_image_url", length = 500)
     private String guideImageUrl;
 

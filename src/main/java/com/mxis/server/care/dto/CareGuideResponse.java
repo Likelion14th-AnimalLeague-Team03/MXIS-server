@@ -6,6 +6,7 @@ public record CareGuideResponse(
         Long productId,
         String materialId,
         String materialDisplayName,
+        String careType,
         String guideImageUrl,
         String title,
         String description,

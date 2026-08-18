@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CareGuideRepository extends JpaRepository<CareGuide, Long> {
 
+    Optional<CareGuide> findFirstByCareTypeAndActiveTrue(String careType);
+
     Optional<CareGuide> findFirstByMaterialIdAndMaterialSubtypeAndActiveTrue(String materialId, String materialSubtype);
 
     Optional<CareGuide> findFirstByMaterialIdAndMaterialSubtypeIsNullAndActiveTrue(String materialId);
