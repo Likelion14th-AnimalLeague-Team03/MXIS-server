@@ -143,7 +143,7 @@ class ReservationControllerTest {
     void getMyReservations_success_returnsSummaryList() throws Exception {
         given(reservationService.getMyReservations(eq(1L), eq(ReservationStatus.CONFIRMED)))
                 .willReturn(List.of(new ReservationSummaryResponse(100L, 20L, "MCM Aren Shopper",
-                        1L, "MCM 청담 플래그십", ReservationType.FREE, RESERVED_DATE, RESERVED_TIME,
+                        1L, "MCM 청담 플래그십", "서울 강남구 청담동 1", ReservationType.FREE, RESERVED_DATE, RESERVED_TIME,
                         ReservationStatus.CONFIRMED)));
 
         mockMvc.perform(get("/api/v1/reservations")

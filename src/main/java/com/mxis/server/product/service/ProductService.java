@@ -9,6 +9,7 @@ import com.mxis.server.product.entity.Product;
 import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.product.repository.ProductRepository;
+import com.mxis.server.sensor.repository.SensorReadingRepository;
 import com.mxis.server.user.entity.User;
 import com.mxis.server.user.repository.UserRepository;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ProductService {
     private final ProductDeviceRepository productDeviceRepository;
     private final UserRepository userRepository;
     private final DppCatalogService dppCatalogService;
+    private final SensorReadingRepository sensorReadingRepository;
 
     public ProductRecognizeResponse recognize(String dppCode) {
         return dppCatalogService.recognize(dppCode);
@@ -45,23 +47,24 @@ public class ProductService {
                 request.materialSubtypes(),
                 request.color(),
                 request.productImageUrl(),
+                request.productThumbnailUrl(),
                 request.purchasedAt());
 
         Product saved = productRepository.save(product);
-        return ProductResponse.from(saved, isPrimary(user, saved));
+        return ProductResponse.from(saved, isPrimary(user, saved), 0);
     }
 
     public List<ProductResponse> getMyProducts(Long userId) {
         User user = getActiveUser(userId);
         return productRepository.findAllActiveByUserId(userId).stream()
-                .map(product -> ProductResponse.from(product, isPrimary(user, product)))
+                .map(product -> ProductResponse.from(product, isPrimary(user, product), totalOutingCount(product)))
                 .toList();
     }
 
     public ProductResponse getProduct(Long userId, Long productId) {
         User user = getActiveUser(userId);
         Product product = getOwnedProduct(userId, productId);
-        return ProductResponse.from(product, isPrimary(user, product));
+        return ProductResponse.from(product, isPrimary(user, product), totalOutingCount(product));
     }
 
     public ProductResponse getPrimaryProduct(Long userId) {
@@ -70,7 +73,7 @@ public class ProductService {
         if (primaryProduct == null || primaryProduct.isDeleted()) {
             return null;
         }
-        return ProductResponse.from(primaryProduct, true);
+        return ProductResponse.from(primaryProduct, true, totalOutingCount(primaryProduct));
     }
 
     @Transactional
@@ -78,7 +81,11 @@ public class ProductService {
         User user = getActiveUser(userId);
         Product product = getOwnedProduct(userId, productId);
         user.changePrimaryProduct(product);
-        return ProductResponse.from(product, true);
+        return ProductResponse.from(product, true, totalOutingCount(product));
+    }
+
+    private long totalOutingCount(Product product) {
+        return sensorReadingRepository.countTotalOutingSessions(product.getId());
     }
 
     @Transactional

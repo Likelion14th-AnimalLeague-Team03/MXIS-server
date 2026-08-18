@@ -49,13 +49,11 @@ public class AuthController {
         return ApiResponse.ok(authService.refresh(request));
     }
 
-    // 카카오 로그인도 일단 비활성화, 일반 이메일/비밀번호 로그인만 구현 (2026-08-17).
-    // 재활성화 시 이 주석만 풀면 됨 — AuthService.kakaoLogin/KakaoLoginRequest는 그대로 유지.
-    // @SecurityRequirements
-    // @PostMapping("/kakao/login")
-    // public ApiResponse<TokenResponse> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
-    //     return ApiResponse.ok(authService.kakaoLogin(request));
-    // }
+    @SecurityRequirements
+    @PostMapping("/kakao/login")
+    public ApiResponse<TokenResponse> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        return ApiResponse.ok(authService.kakaoLogin(request));
+    }
 
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@AuthenticationPrincipal UserPrincipal principal) {

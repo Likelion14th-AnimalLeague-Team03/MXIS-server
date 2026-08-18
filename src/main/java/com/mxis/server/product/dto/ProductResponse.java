@@ -15,15 +15,13 @@ public record ProductResponse(
         List<String> materialSubtypes,
         String color,
         String productImageUrl,
+        String productThumbnailUrl,
         LocalDate purchasedAt,
         LocalDateTime registeredAt,
-        boolean isPrimary
+        boolean isPrimary,
+        long totalOutingCount
 ) {
-    public static ProductResponse from(Product product) {
-        return from(product, false);
-    }
-
-    public static ProductResponse from(Product product, boolean isPrimary) {
+    public static ProductResponse from(Product product, boolean isPrimary, long totalOutingCount) {
         return new ProductResponse(
                 product.getId(),
                 product.getDppCode(),
@@ -34,8 +32,10 @@ public record ProductResponse(
                 product.getMaterialSubtypes(),
                 product.getColor(),
                 product.getProductImageUrl(),
+                product.getProductThumbnailUrl(),
                 product.getPurchasedAt(),
                 product.getRegisteredAt(),
-                isPrimary);
+                isPrimary,
+                totalOutingCount);
     }
 }

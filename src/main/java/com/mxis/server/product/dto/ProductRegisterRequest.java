@@ -14,6 +14,7 @@ public record ProductRegisterRequest(
         List<@Size(max = 50) String> materialSubtypes,
         @Size(max = 30) String color,
         @Size(max = 500) String productImageUrl,
+        @Size(max = 500) String productThumbnailUrl,
         LocalDate purchasedAt
 ) {
 }

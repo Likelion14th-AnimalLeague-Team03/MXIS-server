@@ -148,45 +148,43 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.error.code", is("INVALID_TOKEN")));
     }
 
-    // 카카오 로그인 라우트가 비활성화돼 있어 아래 3개 테스트도 함께 비활성화 (AuthController.kakaoLogin() 주석 참고).
-    // 재활성화 시 이 테스트들도 함께 주석 해제.
-    // @Test
-    // void kakaoLogin_success_returnsTokens() throws Exception {
-    //     KakaoLoginRequest request = new KakaoLoginRequest("kakao-access-token");
-    //     given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
-    //             .willReturn(new TokenResponse("access-token", "refresh-token", "Bearer", stubUser()));
-    //
-    //     mockMvc.perform(post("/api/v1/auth/kakao/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content(objectMapper.writeValueAsString(request)))
-    //             .andExpect(status().isOk())
-    //             .andExpect(jsonPath("$.data.accessToken", is("access-token")))
-    //             .andExpect(jsonPath("$.data.tokenType", is("Bearer")));
-    // }
-    //
-    // @Test
-    // void kakaoLogin_invalidKakaoToken_returns401() throws Exception {
-    //     KakaoLoginRequest request = new KakaoLoginRequest("bad-token");
-    //     given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
-    //             .willThrow(new BusinessException(ErrorCode.KAKAO_AUTH_FAILED));
-    //
-    //     mockMvc.perform(post("/api/v1/auth/kakao/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content(objectMapper.writeValueAsString(request)))
-    //             .andExpect(status().isUnauthorized())
-    //             .andExpect(jsonPath("$.error.code", is("KAKAO_AUTH_FAILED")));
-    // }
-    //
-    // @Test
-    // void kakaoLogin_blankAccessToken_returns400() throws Exception {
-    //     String body = "{\"accessToken\": \"\"}";
-    //
-    //     mockMvc.perform(post("/api/v1/auth/kakao/login")
-    //                     .contentType(MediaType.APPLICATION_JSON)
-    //                     .content(body))
-    //             .andExpect(status().isBadRequest())
-    //             .andExpect(jsonPath("$.error.code", is("INVALID_INPUT")));
-    // }
+    @Test
+    void kakaoLogin_success_returnsTokens() throws Exception {
+        KakaoLoginRequest request = new KakaoLoginRequest("kakao-access-token");
+        given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
+                .willReturn(new TokenResponse("access-token", "refresh-token", "Bearer", stubUser()));
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken", is("access-token")))
+                .andExpect(jsonPath("$.data.tokenType", is("Bearer")));
+    }
+
+    @Test
+    void kakaoLogin_invalidKakaoToken_returns401() throws Exception {
+        KakaoLoginRequest request = new KakaoLoginRequest("bad-token");
+        given(authService.kakaoLogin(any(KakaoLoginRequest.class)))
+                .willThrow(new BusinessException(ErrorCode.KAKAO_AUTH_FAILED));
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code", is("KAKAO_AUTH_FAILED")));
+    }
+
+    @Test
+    void kakaoLogin_blankAccessToken_returns400() throws Exception {
+        String body = "{\"accessToken\": \"\"}";
+
+        mockMvc.perform(post("/api/v1/auth/kakao/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code", is("INVALID_INPUT")));
+    }
 
     @Test
     void logout_withValidToken_returns200() throws Exception {

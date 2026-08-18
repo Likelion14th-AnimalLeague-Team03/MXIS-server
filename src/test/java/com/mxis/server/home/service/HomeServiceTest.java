@@ -47,7 +47,7 @@ class HomeServiceTest {
         user = User.createLocal("user@mxis.com", "encoded", "홍길동", "01000000000");
         ReflectionTestUtils.setField(user, "id", 1L);
         product = new Product(user, null, "가방", null, "leather", "가죽", null, "브라운",
-                "https://img", LocalDate.now().minusDays(182));
+                "https://img", null, LocalDate.now().minusDays(182));
 
         when(userRepository.findActiveById(anyLong())).thenReturn(Optional.of(user));
         when(productRepository.findActiveById(anyLong())).thenReturn(Optional.of(product));

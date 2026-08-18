@@ -60,13 +60,13 @@ class ProductControllerTest {
     private ProductResponse sampleProduct() {
         return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A",
                 "natural_leather", "Spanish Nappa Leather", List.of(), "블랙",
-                "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), false);
+                "https://example.com/product.png", null, LocalDate.of(2025, 1, 1), LocalDateTime.now(), false, 0);
     }
 
     private ProductResponse samplePrimaryProduct() {
         return new ProductResponse(20L, "DPP-001", "트리케 백", "MODEL-A",
                 "natural_leather", "Spanish Nappa Leather", List.of(), "블랙",
-                "https://example.com/product.png", LocalDate.of(2025, 1, 1), LocalDateTime.now(), true);
+                "https://example.com/product.png", null, LocalDate.of(2025, 1, 1), LocalDateTime.now(), true, 0);
     }
 
     @Test
@@ -111,7 +111,8 @@ class ProductControllerTest {
     @Test
     void register_blankProductName_returns400() throws Exception {
         ProductRegisterRequest request = new ProductRegisterRequest(
-                "DPP-001", "", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙", null, null);
+                "DPP-001", "", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙", null, null,
+                null);
 
         mockMvc.perform(post("/api/v1/products")
                         .header("Authorization", "Bearer " + accessToken)
@@ -125,7 +126,7 @@ class ProductControllerTest {
     void register_success_returns201() throws Exception {
         ProductRegisterRequest request = new ProductRegisterRequest(
                 "DPP-001", "트리케 백", "MODEL-A", "natural_leather", "Spanish Nappa Leather", List.of(), "블랙", null,
-                LocalDate.of(2025, 1, 1));
+                null, LocalDate.of(2025, 1, 1));
         given(productService.register(eq(1L), any(ProductRegisterRequest.class))).willReturn(sampleProduct());
 
         mockMvc.perform(post("/api/v1/products")
