@@ -18,6 +18,7 @@ import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import com.mxis.server.product.repository.ProductRepository;
 import com.mxis.server.sensor.dto.SensorAggregate;
+import com.mxis.server.sensor.entity.SensorReading;
 import com.mxis.server.sensor.repository.SensorReadingRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,9 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -53,12 +56,27 @@ public class CareQueryService {
     private final SensorReadingRepository sensorReadingRepository;
     private final CareRuleEngine ruleEngine;
     private final OpenAiExplanationService openAiExplanationService;
+    private final MxisAiClient mxisAiClient;
 
     public AiCareSummaryResponse getAiCareSummary(Long userId, Long productId, SensorPeriod period) {
-        getOwnedProduct(userId, productId);
-
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime from = now.minusDays(period.days());
+        Product product = getOwnedProduct(userId, productId);
+        if (mxisAiClient.isEnabled()) {
+            try {
+                Long deviceId = productDeviceRepository.findActivePrimaryByProductId(productId)
+                        .map(ProductDevice::getDevice)
+                        .map(Device::getId)
+                        .orElse(null);
+                List<SensorReading> readings = sensorReadingRepository
+                        .findByProductIdAndMeasuredAtGreaterThanEqualAndMeasuredAtLessThanOrderByMeasuredAtAsc(
+                                productId, from, now);
+                return mxisAiClient.getCareSummary(product, deviceId, period, readings);
+            } catch (RuntimeException ex) {
+                log.warn("Python AI service 호출 실패. Java fallback으로 전환합니다. productId={}", productId, ex);
+            }
+        }
+
         SensorAggregate aggregate = aggregate(productId, from, now);
         ReadingStats stats = readingStats(productId, from, now);
         AiCareSummaryResponse.DataSufficiency dataSufficiency = dataSufficiency(stats);

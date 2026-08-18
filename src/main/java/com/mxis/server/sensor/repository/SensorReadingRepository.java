@@ -14,6 +14,9 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
 
     Optional<SensorReading> findFirstByProductIdOrderByMeasuredAtDesc(Long productId);
 
+    List<SensorReading> findByProductIdAndMeasuredAtGreaterThanEqualAndMeasuredAtLessThanOrderByMeasuredAtAsc(
+            Long productId, LocalDateTime from, LocalDateTime to);
+
     @Query("""
             SELECT sr.sequenceNumber FROM SensorReading sr
             WHERE sr.device.id = :deviceId AND sr.sequenceNumber IN :sequenceNumbers
