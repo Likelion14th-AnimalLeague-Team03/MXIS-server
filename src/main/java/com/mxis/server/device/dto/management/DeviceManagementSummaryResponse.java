@@ -29,7 +29,7 @@ public record DeviceManagementSummaryResponse(
     public record CurrentEnvironment(
             BigDecimal temperature,
             BigDecimal humidity,
-            LocalDateTime measuredAt
+            String measuredAt
     ) {
     }
 }

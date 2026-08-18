@@ -20,7 +20,7 @@ INSERT INTO care_guides (
 (
     'natural_leather',
     NULL,
-    'https://static.mcmworldwide.com/demo/care-guide/natural-leather.jpg',
+    'http://161.33.38.65:8080/images/natural_leather.png',
     '마른 부드러운 천으로 표면 정돈',
     '먼지와 오염을 부드럽게 제거하여 가죽의 컨디션을 유지해 주세요.',
     JSON_ARRAY('마른 부드러운 천을 준비해주세요.', '결 방향을 따라 부드럽게 닦아주세요.', '강한 힘을 주지 않고 가볍게 닦아주세요.'),
@@ -30,7 +30,7 @@ INSERT INTO care_guides (
 (
     'canvas',
     NULL,
-    'https://static.mcmworldwide.com/demo/care-guide/canvas.jpg',
+    'http://161.33.38.65:8080/images/canvas.png',
     '부드러운 천으로 가볍게 닦기',
     '표면의 먼지를 가볍게 제거하고 습한 상태로 오래 두지 않도록 관리해 주세요.',
     JSON_ARRAY('마른 천을 준비해주세요.', '표면을 가볍게 쓸어내듯 닦아주세요.', '물기나 오염이 남지 않도록 통풍되는 곳에 보관해주세요.'),

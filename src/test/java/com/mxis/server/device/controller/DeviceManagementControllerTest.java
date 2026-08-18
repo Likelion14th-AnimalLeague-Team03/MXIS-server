@@ -73,7 +73,7 @@ class DeviceManagementControllerTest {
                 new DeviceManagementSummaryResponse.CurrentEnvironment(
                         new BigDecimal("24.2"),
                         new BigDecimal("47.8"),
-                        LocalDateTime.of(2026, 8, 17, 12, 5))));
+                        "2시간 전")));
 
         mockMvc.perform(get("/api/v1/device-management/summary")
                         .header("Authorization", "Bearer " + accessToken))
@@ -82,7 +82,8 @@ class DeviceManagementControllerTest {
                 .andExpect(jsonPath("$.data.primaryProduct.materialDisplayName", is("Visetos Canvas")))
                 .andExpect(jsonPath("$.data.totalOutingCount", is(45)))
                 .andExpect(jsonPath("$.data.primaryDevice.deviceImageUrl", is("https://example.com/device.png")))
-                .andExpect(jsonPath("$.data.currentEnvironment.temperature", is(24.2)));
+                .andExpect(jsonPath("$.data.currentEnvironment.temperature", is(24.2)))
+                .andExpect(jsonPath("$.data.currentEnvironment.measuredAt", is("2시간 전")));
     }
 
     @Test
@@ -108,7 +109,7 @@ class DeviceManagementControllerTest {
                         new ProductDeviceManagementSummaryResponse.CurrentEnvironment(
                                 new BigDecimal("23.5"),
                                 new BigDecimal("48.0"),
-                                LocalDateTime.of(2026, 8, 19, 14, 20)),
+                                "방금전"),
                         45,
                         new ProductDeviceManagementSummaryResponse.ConnectedDevice(
                                 10L,
@@ -140,6 +141,7 @@ class DeviceManagementControllerTest {
                 .andExpect(jsonPath("$.data.product.isPrimary", is(false)))
                 .andExpect(jsonPath("$.data.currentEnvironment.temperature", is(23.5)))
                 .andExpect(jsonPath("$.data.currentEnvironment.humidity", is(48.0)))
+                .andExpect(jsonPath("$.data.currentEnvironment.measuredAt", is("방금전")))
                 .andExpect(jsonPath("$.data.totalOutingCount", is(45)))
                 .andExpect(jsonPath("$.data.primaryDevice.deviceName", is("내 MXIS")))
                 .andExpect(jsonPath("$.data.primaryDevice.connectionStatus", is("CONNECTED")))

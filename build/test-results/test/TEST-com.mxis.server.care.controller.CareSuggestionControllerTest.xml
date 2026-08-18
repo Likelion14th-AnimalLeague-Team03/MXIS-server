@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.care.controller.CareSuggestionControllerTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-08-18T15:10:07" hostname="minuui-MacBookAir.local" time="0.02">
+<testsuite name="com.mxis.server.care.controller.CareSuggestionControllerTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-08-18T16:30:30" hostname="minuui-MacBookAir.local" time="0.017">
   <properties/>
-  <testcase name="getSuggestion_notOwned_returns403()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.006"/>
-  <testcase name="markRead_success_returnsIdAndFlag()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.004"/>
-  <testcase name="getSuggestion_success_marksReadInResponse()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.003"/>
+  <testcase name="getSuggestion_notOwned_returns403()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.005"/>
+  <testcase name="markRead_success_returnsIdAndFlag()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.003"/>
+  <testcase name="getSuggestion_success_marksReadInResponse()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.002"/>
   <testcase name="markRead_notFound_returns404()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.003"/>
   <testcase name="markRead_requiresAuth_returns401WithoutToken()" classname="com.mxis.server.care.controller.CareSuggestionControllerTest" time="0.002"/>
-  <system-out><![CDATA[2026-08-19T00:10:07.273+09:00  INFO 48901 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.care.controller.CareSuggestionControllerTest]: CareSuggestionControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-19T00:10:07.276+09:00  INFO 48901 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.care.controller.CareSuggestionControllerTest
+  <system-out><![CDATA[2026-08-19T01:30:29.999+09:00  INFO 53475 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.care.controller.CareSuggestionControllerTest]: CareSuggestionControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-19T01:30:30.001+09:00  INFO 53475 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.care.controller.CareSuggestionControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -18,23 +18,23 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-19T00:10:07.285+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Starting CareSuggestionControllerTest using Java 17.0.17 with PID 48901 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-19T00:10:07.285+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-19T00:10:07.285+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : The following 1 profile is active: "local"
-2026-08-19T00:10:07.353+09:00  WARN 48901 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-19T01:30:30.011+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Starting CareSuggestionControllerTest using Java 17.0.17 with PID 53475 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-19T01:30:30.011+09:00 DEBUG 53475 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-19T01:30:30.011+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : The following 1 profile is active: "local"
+2026-08-19T01:30:30.083+09:00  WARN 53475 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 6b56a7d7-594e-43cd-b2fe-e0902e91eefa
+Using generated security password: 641725bd-7d22-4cbb-a963-e65eb3fd2b19
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-19T00:10:07.353+09:00  INFO 48901 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-19T00:10:07.376+09:00 DEBUG 48901 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-19T00:10:07.376+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-19T00:10:07.376+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-19T00:10:07.376+09:00  INFO 48901 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-19T00:10:07.379+09:00  INFO 48901 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Started CareSuggestionControllerTest in 0.102 seconds (process running for 2.857)
-2026-08-19T00:10:07.383+09:00  WARN 48901 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인 제품의 제안이 아닙니다.
-2026-08-19T00:10:07.396+09:00  WARN 48901 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 제안 정보를 찾을 수 없습니다.
+2026-08-19T01:30:30.083+09:00  INFO 53475 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-19T01:30:30.111+09:00 DEBUG 53475 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-19T01:30:30.111+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-19T01:30:30.111+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-19T01:30:30.111+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-19T01:30:30.114+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.c.c.CareSuggestionControllerTest   : Started CareSuggestionControllerTest in 0.112 seconds (process running for 2.337)
+2026-08-19T01:30:30.118+09:00  WARN 53475 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 본인 제품의 제안이 아닙니다.
+2026-08-19T01:30:30.129+09:00  WARN 53475 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 제안 정보를 찾을 수 없습니다.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

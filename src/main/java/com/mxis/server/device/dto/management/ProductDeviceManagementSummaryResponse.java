@@ -45,13 +45,13 @@ public record ProductDeviceManagementSummaryResponse(
     public record CurrentEnvironment(
             BigDecimal temperature,
             BigDecimal humidity,
-            LocalDateTime measuredAt
+            String measuredAt
     ) {
-        public static CurrentEnvironment from(SensorReading reading) {
+        public static CurrentEnvironment from(SensorReading reading, String measuredAt) {
             return new CurrentEnvironment(
                     reading.getTemperature(),
                     reading.getHumidity(),
-                    reading.getMeasuredAt());
+                    measuredAt);
         }
     }
 

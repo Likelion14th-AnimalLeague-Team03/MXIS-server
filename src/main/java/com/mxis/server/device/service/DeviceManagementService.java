@@ -14,6 +14,9 @@ import com.mxis.server.sensor.entity.SensorReading;
 import com.mxis.server.sensor.repository.SensorReadingRepository;
 import com.mxis.server.user.entity.User;
 import com.mxis.server.user.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DeviceManagementService {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     private final ProductRepository productRepository;
     private final ProductDeviceRepository productDeviceRepository;
@@ -81,7 +86,8 @@ public class DeviceManagementService {
 
         return new ProductDeviceManagementSummaryResponse(
                 ProductDeviceManagementSummaryResponse.ProductSummary.from(product, isPrimary),
-                latestReading == null ? null : ProductDeviceManagementSummaryResponse.CurrentEnvironment.from(latestReading),
+                latestReading == null ? null : ProductDeviceManagementSummaryResponse.CurrentEnvironment.from(
+                        latestReading, formatMeasuredAt(latestReading.getMeasuredAt())),
                 sensorReadingRepository.countTotalOutingSessions(productId),
                 primaryDevice,
                 connectedDevices);
@@ -108,6 +114,31 @@ public class DeviceManagementService {
         return new DeviceManagementSummaryResponse.CurrentEnvironment(
                 reading.getTemperature(),
                 reading.getHumidity(),
-                reading.getMeasuredAt());
+                formatMeasuredAt(reading.getMeasuredAt()));
+    }
+
+    private String formatMeasuredAt(LocalDateTime measuredAt) {
+        if (measuredAt == null) {
+            return null;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        long minutes = ChronoUnit.MINUTES.between(measuredAt, now);
+        if (minutes < 1) {
+            return "방금전";
+        }
+        if (minutes < 60) {
+            return minutes + "분 전";
+        }
+
+        long hours = ChronoUnit.HOURS.between(measuredAt, now);
+        if (hours < 24) {
+            return hours + "시간 전";
+        }
+
+        long days = ChronoUnit.DAYS.between(measuredAt.toLocalDate(), now.toLocalDate());
+        if (days < 10) {
+            return days + "일 전";
+        }
+        return measuredAt.toLocalDate().format(DATE_FORMATTER);
     }
 }
