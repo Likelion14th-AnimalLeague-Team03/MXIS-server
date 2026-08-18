@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mxis.server.care.service.CareRuleEngineTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2026-08-18T16:30:30" hostname="minuui-MacBookAir.local" time="0.032">
+<testsuite name="com.mxis.server.care.service.CareRuleEngineTest" tests="36" skipped="0" failures="0" errors="0" timestamp="2026-08-18T18:21:18" hostname="minuui-MacBookAir.local" time="0.044">
   <properties/>
   <testcase name="conditionGrade_idealHumidityDoesNotCancelHighShock()" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="[1] humidity=IDEAL, shock=LOW, expected=STABLE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.004"/>
+  <testcase name="[1] humidity=IDEAL, shock=LOW, expected=STABLE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.003"/>
   <testcase name="[2] humidity=IDEAL, shock=MEDIUM, expected=BALANCED" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[3] humidity=SLIGHTLY_DRY, shock=LOW, expected=BALANCED" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[4] humidity=SLIGHTLY_DRY, shock=MEDIUM, expected=BALANCED" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[5] humidity=SLIGHTLY_HUMID, shock=MEDIUM, expected=BALANCED" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="[6] humidity=SLIGHTLY_DRY, shock=HIGH, expected=LIGHT_CARE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
+  <testcase name="[6] humidity=SLIGHTLY_DRY, shock=HIGH, expected=LIGHT_CARE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.001"/>
   <testcase name="[7] humidity=SLIGHTLY_HUMID, shock=HIGH, expected=LIGHT_CARE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[8] humidity=DRY_RISK, shock=LOW, expected=LIGHT_CARE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[9] humidity=DRY_RISK, shock=MEDIUM, expected=LIGHT_CARE" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
@@ -22,21 +22,21 @@
   <testcase name="[5] ratio=0.5, expected=잦음" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[6] ratio=1.0, expected=잦음" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[1] count=0, expected=LOW" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="[2] count=3, expected=LOW" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.001"/>
+  <testcase name="[2] count=3, expected=LOW" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[3] count=4, expected=MEDIUM" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[4] count=10, expected=MEDIUM" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[5] count=11, expected=HIGH" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="[6] count=50, expected=HIGH" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
+  <testcase name="[6] count=50, expected=HIGH" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.001"/>
   <testcase name="[1] humidity=25.0, expected=DRY_RISK" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[2] humidity=29.9, expected=DRY_RISK" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[3] humidity=30.0, expected=SLIGHTLY_DRY" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[4] humidity=39.9, expected=SLIGHTLY_DRY" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="[5] humidity=40.0, expected=IDEAL" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
+  <testcase name="[5] humidity=40.0, expected=IDEAL" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.001"/>
   <testcase name="[6] humidity=60.0, expected=IDEAL" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[7] humidity=60.1, expected=SLIGHTLY_HUMID" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[8] humidity=70.0, expected=SLIGHTLY_HUMID" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
   <testcase name="[9] humidity=70.1, expected=HUMID_RISK" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
-  <testcase name="needsSuggestion_onlyForLightCareAndAbove()" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.0"/>
+  <testcase name="needsSuggestion_onlyForLightCareAndAbove()" classname="com.mxis.server.care.service.CareRuleEngineTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

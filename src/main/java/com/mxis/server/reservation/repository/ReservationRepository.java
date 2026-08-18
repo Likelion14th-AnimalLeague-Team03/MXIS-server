@@ -1,6 +1,7 @@
 package com.mxis.server.reservation.repository;
 
 import com.mxis.server.common.enums.ReservationStatus;
+import com.mxis.server.common.enums.ReservationType;
 import com.mxis.server.reservation.entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -36,6 +37,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     boolean existsConfirmedSlot(@Param("storeId") Long storeId, @Param("date") LocalDate date,
                                 @Param("time") LocalTime time, @Param("excludeId") Long excludeId);
+
+    @Query("""
+            SELECT COUNT(r) > 0 FROM Reservation r
+            WHERE r.user.id = :userId AND r.reservationType = :reservationType
+              AND r.status IN (
+                  com.mxis.server.common.enums.ReservationStatus.PENDING_APPROVAL,
+                  com.mxis.server.common.enums.ReservationStatus.CONFIRMED
+              )
+            """)
+    boolean existsActiveByUserIdAndReservationType(
+            @Param("userId") Long userId, @Param("reservationType") ReservationType reservationType);
 
     @Query("""
             SELECT r FROM Reservation r

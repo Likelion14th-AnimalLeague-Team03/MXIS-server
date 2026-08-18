@@ -3,17 +3,17 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta http-equiv="x-ua-compatible" content="IE=edge"/>
-<title>Test results - HomeServiceTest</title>
+<title>Test results - ReservationServiceTest</title>
 <link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
 <link href="../css/style.css" rel="stylesheet" type="text/css"/>
 <script src="../js/report.js" type="text/javascript"></script>
 </head>
 <body>
 <div id="content">
-<h1>HomeServiceTest</h1>
+<h1>ReservationServiceTest</h1>
 <div class="breadcrumbs">
 <a href="../index.html">all</a> &gt; 
-<a href="../packages/com.mxis.server.home.service.html">com.mxis.server.home.service</a> &gt; HomeServiceTest</div>
+<a href="../packages/com.mxis.server.reservation.service.html">com.mxis.server.reservation.service</a> &gt; ReservationServiceTest</div>
 <div id="summary">
 <table>
 <tr>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.058s</div>
+<div class="counter">0.071s</div>
 <p>duration</p>
 </div>
 </td>
@@ -75,23 +75,23 @@
 </tr>
 </thead>
 <tr>
-<td class="success">noReport_meansCollecting()</td>
-<td class="success">0.001s</td>
+<td class="success">create_freeReservation_isConfirmedImmediately()</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="success">reportExistsButDeviceStale_meansNeedsUpdate()</td>
-<td class="success">0.052s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">reportFreshAndDeviceSynced_meansNormalWithScore()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">toScore_mapsGradeTo25PercentSteps()</td>
+<td class="success">create_paidReservation_waitsForApproval()</td>
 <td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">create_sameActiveReservationType_throwsConflict()</td>
+<td class="success">0.063s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">pendingApprovalReservation_canBeCancelled()</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 </table>

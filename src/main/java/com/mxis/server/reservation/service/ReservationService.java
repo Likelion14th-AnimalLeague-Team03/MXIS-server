@@ -3,6 +3,7 @@ package com.mxis.server.reservation.service;
 import com.mxis.server.care.entity.CareSuggestion;
 import com.mxis.server.care.repository.CareSuggestionRepository;
 import com.mxis.server.common.enums.ReservationStatus;
+import com.mxis.server.common.enums.ReservationType;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.product.entity.Product;
@@ -48,6 +49,7 @@ public class ReservationService {
         Store store = storeRepository.findByIdAndIsActiveTrue(request.storeId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
+        ensureNoActiveReservationOfSameType(userId, request.reservationType());
         validateSlot(store, request.reservedDate(), request.reservedTime());
         ensureSlotFree(store.getId(), request.reservedDate(), request.reservedTime(), NO_EXCLUSION);
 
@@ -130,6 +132,16 @@ public class ReservationService {
         if (reservationRepository.existsConfirmedSlot(storeId, date, time, excludeId)) {
             throw new BusinessException(ErrorCode.SLOT_ALREADY_RESERVED);
         }
+    }
+
+    private void ensureNoActiveReservationOfSameType(Long userId, ReservationType reservationType) {
+        if (!reservationRepository.existsActiveByUserIdAndReservationType(userId, reservationType)) {
+            return;
+        }
+        String message = reservationType == ReservationType.PAID
+                ? "이미 케어 컨시어지 예약이 있습니다."
+                : "이미 무상케어 예약이 있습니다.";
+        throw new BusinessException(ErrorCode.RESERVATION_TYPE_ALREADY_EXISTS, message);
     }
 
     private void save(Reservation reservation) {

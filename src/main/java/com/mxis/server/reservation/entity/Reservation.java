@@ -94,7 +94,9 @@ public class Reservation extends BaseTimeEntity {
         this.reservedDate = reservedDate;
         this.reservedTime = reservedTime;
         this.customerNote = customerNote;
-        this.status = ReservationStatus.CONFIRMED;
+        this.status = reservationType == ReservationType.PAID
+                ? ReservationStatus.PENDING_APPROVAL
+                : ReservationStatus.CONFIRMED;
     }
 
     public boolean isOwnedBy(Long userId) {
@@ -103,7 +105,8 @@ public class Reservation extends BaseTimeEntity {
 
     /** 취소/완료된 예약은 더 이상 변경할 수 없다. */
     public boolean isModifiable() {
-        return status == ReservationStatus.CONFIRMED;
+        return status == ReservationStatus.CONFIRMED
+                || status == ReservationStatus.PENDING_APPROVAL;
     }
 
     public void reschedule(LocalDate reservedDate, LocalTime reservedTime, String customerNote) {

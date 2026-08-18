@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.039s</div>
+<div class="counter">0.043s</div>
 <p>duration</p>
 </div>
 </td>
@@ -94,17 +94,17 @@
 </tr>
 <tr>
 <td class="success">lookup_requiresAuth_returns401WithoutToken()</td>
-<td class="success">0.001s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">lookup_success_returnsRegistrable()</td>
-<td class="success">0.005s</td>
+<td class="success">0.006s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">register_alreadyRegistered_returns409()</td>
-<td class="success">0.006s</td>
+<td class="success">0.007s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -119,12 +119,12 @@
 </tr>
 <tr>
 <td class="success">updateStatus_batteryLevelOutOfRange_returns400()</td>
-<td class="success">0.007s</td>
+<td class="success">0.004s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">updateStatus_success_returnsUpdatedDevice()</td>
-<td class="success">0.008s</td>
+<td class="success">0.012s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -132,8 +132,8 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2026-08-19T01:30:30.191+09:00  INFO 53475 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.device.controller.DeviceControllerTest]: DeviceControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-08-19T01:30:30.198+09:00  INFO 53475 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.device.controller.DeviceControllerTest
+<pre>2026-08-19T03:21:18.402+09:00  INFO 60256 --- [mxis-server] [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.mxis.server.device.controller.DeviceControllerTest]: DeviceControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-19T03:21:18.410+09:00  INFO 60256 --- [mxis-server] [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.mxis.server.MxisServerApplication for test class com.mxis.server.device.controller.DeviceControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -144,23 +144,23 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-08-19T01:30:30.206+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Starting DeviceControllerTest using Java 17.0.17 with PID 53475 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
-2026-08-19T01:30:30.206+09:00 DEBUG 53475 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Running with Spring Boot v3.3.5, Spring v6.1.14
-2026-08-19T01:30:30.206+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : The following 1 profile is active: &quot;local&quot;
-2026-08-19T01:30:30.282+09:00  WARN 53475 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
+2026-08-19T03:21:18.418+09:00  INFO 60256 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Starting DeviceControllerTest using Java 17.0.17 with PID 60256 (started by minu in /Users/minu/IdeaProjects/MXIS-server)
+2026-08-19T03:21:18.418+09:00 DEBUG 60256 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-08-19T03:21:18.418+09:00  INFO 60256 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : The following 1 profile is active: &quot;local&quot;
+2026-08-19T03:21:18.499+09:00  WARN 60256 --- [mxis-server] [    Test worker] .s.s.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 4336b1d4-e4cc-4cb3-b95d-ce1ce3fee5e8
+Using generated security password: 4c31e4ab-d21c-4a63-b6c6-de3a88d0ec08
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-08-19T01:30:30.283+09:00  INFO 53475 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-08-19T01:30:30.307+09:00 DEBUG 53475 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
-2026-08-19T01:30:30.307+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-19T01:30:30.307+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-19T01:30:30.307+09:00  INFO 53475 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-08-19T01:30:30.310+09:00  INFO 53475 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Started DeviceControllerTest in 0.111 seconds (process running for 2.533)
-2026-08-19T01:30:30.330+09:00  WARN 53475 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 등록된 기기입니다.
-2026-08-19T01:30:30.334+09:00  WARN 53475 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기 정보를 찾을 수 없습니다.
+2026-08-19T03:21:18.499+09:00  INFO 60256 --- [mxis-server] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-19T03:21:18.523+09:00 DEBUG 60256 --- [mxis-server] [    Test worker] c.m.s.c.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-08-19T03:21:18.523+09:00  INFO 60256 --- [mxis-server] [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-19T03:21:18.523+09:00  INFO 60256 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-19T03:21:18.523+09:00  INFO 60256 --- [mxis-server] [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-08-19T03:21:18.526+09:00  INFO 60256 --- [mxis-server] [    Test worker] c.m.s.d.controller.DeviceControllerTest  : Started DeviceControllerTest in 0.115 seconds (process running for 2.747)
+2026-08-19T03:21:18.553+09:00  WARN 60256 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 이미 등록된 기기입니다.
+2026-08-19T03:21:18.558+09:00  WARN 60256 --- [mxis-server] [    Test worker] c.m.s.c.e.GlobalExceptionHandler         : BusinessException: 기기 정보를 찾을 수 없습니다.
 </pre>
 </span>
 </div>
@@ -172,7 +172,7 @@ This generated password is for development use only. Your security configuration
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 19. 오전 1:30:31</p>
+<a href="http://www.gradle.org">Gradle 8.10</a> at 2026. 8. 19. 오전 3:21:20</p>
 </div>
 </div>
 </body>
