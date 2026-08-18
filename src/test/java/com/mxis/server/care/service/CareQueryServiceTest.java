@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  */
 class CareQueryServiceTest {
 
-    private final CareQueryService service = new CareQueryService(null, null, null, null, null, null, null);
+    private final CareQueryService service = new CareQueryService(null, null, null, null, null, null, null, null);
 
     private static HumidityPoint point(String date, double value) {
         return new HumidityPoint(LocalDate.parse(date), BigDecimal.valueOf(value));
