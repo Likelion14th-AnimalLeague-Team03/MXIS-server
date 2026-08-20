@@ -101,6 +101,21 @@ public class Device extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
+    /** 같은 일련번호로 재등록될 때, 삭제됐던 행을 새 소유자/정보로 되살린다. */
+    public void reactivate(User user, String deviceName, String macAddress,
+                            String firmwareVersion, String deviceImageUrl) {
+        this.user = user;
+        this.deviceName = deviceName;
+        this.macAddress = macAddress;
+        this.firmwareVersion = firmwareVersion;
+        this.deviceImageUrl = deviceImageUrl;
+        this.connectionStatus = DeviceConnectionStatus.DISCONNECTED;
+        this.batteryLevel = null;
+        this.lastSyncedAt = null;
+        this.registeredAt = LocalDateTime.now();
+        this.deletedAt = null;
+    }
+
     public boolean isDeleted() {
         return deletedAt != null;
     }

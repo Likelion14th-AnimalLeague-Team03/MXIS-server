@@ -40,15 +40,23 @@ public class DeviceService {
         User user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        Device device = new Device(
-                user,
-                request.serialNumber(),
-                request.deviceName(),
-                request.macAddress(),
-                request.firmwareVersion(),
-                request.deviceImageUrl());
+        // 삭제됐던 기기가 같은 일련번호로 재등록되는 경우, DB의 serial_number UNIQUE 제약은
+        // 삭제 여부와 무관하게 걸려있어 새로 INSERT하면 제약 위반이 난다. 기존 행을 되살린다.
+        Device device = deviceRepository.findBySerialNumber(request.serialNumber())
+                .map(existing -> {
+                    existing.reactivate(user, request.deviceName(), request.macAddress(),
+                            request.firmwareVersion(), request.deviceImageUrl());
+                    return existing;
+                })
+                .orElseGet(() -> deviceRepository.save(new Device(
+                        user,
+                        request.serialNumber(),
+                        request.deviceName(),
+                        request.macAddress(),
+                        request.firmwareVersion(),
+                        request.deviceImageUrl())));
 
-        return DeviceResponse.from(deviceRepository.save(device));
+        return DeviceResponse.from(device);
     }
 
     public List<DeviceResponse> getMyDevices(Long userId) {

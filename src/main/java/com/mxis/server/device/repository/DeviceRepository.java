@@ -19,4 +19,6 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     Optional<Device> findActiveBySerialNumber(@Param("serialNumber") String serialNumber);
 
     boolean existsBySerialNumberAndDeletedAtIsNull(String serialNumber);
+
+    Optional<Device> findBySerialNumber(String serialNumber);
 }
