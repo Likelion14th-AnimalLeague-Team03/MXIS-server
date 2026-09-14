@@ -2153,6 +2153,18 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 
 ---
 
+진단 홈의 `condition.summary`와 `condition.description`은 저장된 상태별 짧은 문장으로 반환한다. AI의 긴 문장과 근거 목록은 이 두 필드를 덮어쓰지 않는다. 프론트는 두 필드를 별도 텍스트 영역으로 표시하며 줄바꿈은 화면 너비에 따라 달라질 수 있다. 상세 케어 리포트의 설명은 기존 방식으로 유지한다.
+
+| 상태 | summary | description |
+| --- | --- | --- |
+| COLLECTING_DATA | 센서 데이터를 모으고 있습니다. | 최근 기록이 더 쌓이면 관리 상태를 알려드릴게요. |
+| STABLE | 안정적으로 유지되고 있습니다. | 최근 환경과 사용 기록이 권장 범위에 있습니다. |
+| BALANCED | 균형 있게 유지되고 있습니다. | 최근 환경과 사용 기록이 안정적인 범위에 있습니다. |
+| LIGHT_CARE | 가벼운 관리가 필요합니다. | 최근 기록에 맞춰 보관 환경과 사용 습관을 살펴봐주세요. |
+| EXPERT_CHECK | 전문가의 확인을 권장합니다. | 최근 환경과 사용 기록에서 점검이 필요한 신호가 있습니다. |
+
+데이터 상태가 `SUFFICIENT`가 아니면 기존 등급과 관계없이 수집 중 문구를 사용한다.
+
 ### 8-10. 상태 리포트 (화면 단위 버전)
 
 ### API 기본 정보
@@ -2222,39 +2234,51 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 
 ---
 
-### 8-12. 소재별 케어 가이드
-
-### API 기본 정보
----
+### 8-12. 관리 유형별 케어 가이드
 
 | 항목 | 내용 |
 | --- | --- |
-| API 명 | 케어 가이드 |
 | Endpoint | /api/v1/care/products/{productId}/guide |
 | Method | GET |
 | 권한 | User (제품 본인 소유) |
-| 설명 | `care_guides`(ERD 원본에 없는 신규 테이블)에서 소재 기준 관리 가이드를 조회한다. |
+| 설명 | 7개 관리 유형 중 현재 제품에 추천하는 가이드 1개를 반환한다. |
 
-### Response
----
 ```json
 {
   "success": true,
   "data": {
-    "productId": 1, "materialId": "canvas", "materialDisplayName": "Visetos Canvas",
-    "guideImageUrl": "https://...", "title": "캔버스 소재 관리법",
-    "description": "...", "steps": ["직사광선을 피해 보관하세요.", "..."], "tip": "..."
+    "productId": 1,
+    "materialId": "natural_leather",
+    "materialDisplayName": "천연 가죽",
+    "careType": "ventilated_humidity_dry",
+    "guideImageUrl": "http://161.33.38.65:8080/images/ventilated_humidity_dry.png",
+    "title": "통풍이 잘되는 곳에서 충분히 습기를 식혀주세요.",
+    "description": "최근 습도 기록에 맞춰 습기가 머물지 않도록 보관 환경을 살펴봐주세요.",
+    "steps": [
+      "직사광선이 닿지 않는 통풍되는 곳으로 옮겨주세요.",
+      "가방 주변에 공기가 흐를 수 있도록 여유 공간을 두어주세요.",
+      "드라이어나 난방기 대신 자연스럽게 습기를 식혀주세요."
+    ],
+    "tip": "습한 상태로 밀폐된 공간에 오래 두지 않도록 해주세요."
   }
 }
 ```
 
-**매칭 우선순위**: `product.materialSubtypes`에 있는 세부 소재(subtype) 각각을 `materialId`+`materialSubtype` 조합으로 먼저 찾고, 못 찾으면 `materialId`만으로 `materialSubtype IS NULL`인 공통 가이드를 찾는다. 둘 다 없으면 404.
+| careType | 제목 |
+| --- | --- |
+| ventilated_shade_storage | 직사광선을 피해 통풍이 잘되는 곳에 보관하세요. |
+| dry_soft_cloth_wipe | 마른 부드러운 천으로 표면을 정돈해주세요. |
+| ventilated_humidity_dry | 통풍이 잘되는 곳에서 충분히 습기를 식혀주세요. |
+| avoid_dry_storage | 건조한 환경을 피해 안정적인 곳에 보관해주세요. |
+| avoid_heat_cool_down | 더운 환경을 피해 서늘한 곳에서 가방의 열기를 식혀주세요. |
+| long_term_storage_check | 오랜 시간 보관했다면 가볍게 꺼내 상태를 살펴봐주세요. |
+| shock_impact_check | 충격이 생각보다 많았어요. 가방의 상태와 금속 장식을 가볍게 확인해주세요. |
 
-**발생할 수 있는 오류 코드**
+이미지 주소는 `http://161.33.38.65:8080/images/{careType}.png`다. 제목·이미지·설명·순서·팁은 같은 DB 가이드에서 반환하며 AI 문구를 섞지 않는다.
 
-| HTTP Status | code | message |
-| --- | --- | --- |
-| 404 | NOT_FOUND | 관리 가이드를 찾을 수 없습니다. |
+**선택 기준:** 최신 30일 리포트의 데이터가 충분하면 AI의 `aiCareSummary.llmCopy.careGuide.careType`을 위 7종으로 검증해 우선 사용한다. 미지원·누락 값은 리포트의 주요 요인으로 선택한다. 습도는 저습(평균 40% 미만)이면 건조 회피, 그 외에는 습기 환기, 건조 요인은 건조 회피, 고온 요인은 평균 28℃ 초과일 때 열기 식히기, 충격 요인은 충격 기록이 있을 때 상태 확인을 선택한다. `usage_rest`나 센서 데이터 부재만으로 장기 보관을 추정하지 않는다. 장기 보관은 충분한 데이터의 AI가 해당 유형을 명시한 경우에 선택한다.
+
+리포트 없음·데이터 부족·오래된 데이터 또는 선택 근거가 없으면 기존 소재 기본값(천연 가죽: 통풍 보관, 그 외: 마른 천 정돈)을 사용한다. 선택된 유형의 활성 DB 가이드가 없으면 다른 유형의 이미지와 섞지 않고 `404 NOT_FOUND`를 반환한다. 배포 시 V17 마이그레이션으로 7종을 먼저 제공해야 한다.
 
 ---
 

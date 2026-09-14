@@ -13,6 +13,8 @@ import com.mxis.server.care.entity.CareGuide;
 import com.mxis.server.care.entity.CareReport;
 import com.mxis.server.care.repository.CareGuideRepository;
 import com.mxis.server.care.repository.CareReportRepository;
+import com.mxis.server.common.enums.CareConditionGrade;
+import com.mxis.server.common.enums.CareType;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.product.entity.Product;
@@ -21,7 +23,6 @@ import com.mxis.server.sensor.dto.SensorAggregate;
 import com.mxis.server.sensor.repository.SensorReadingRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,9 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CareScreenService {
-
-    private static final String CARE_TYPE_VENTILATED_SHADE_STORAGE = "ventilated_shade_storage";
-    private static final String CARE_TYPE_DRY_SOFT_CLOTH_WIPE = "dry_soft_cloth_wipe";
 
     private final ProductRepository productRepository;
     private final CareReportRepository careReportRepository;
@@ -50,13 +48,10 @@ public class CareScreenService {
     public CareDiagnosisHomeResponse getDiagnosisHome(Long userId, Long productId) {
         Product product = getOwnedProduct(userId, productId);
         CareReport report = latestReport(productId);
-        JsonNode ai = aiCareSummary(report);
         return new CareDiagnosisHomeResponse(
                 ScreenProductSummary.from(product),
                 sensorReadingRepository.countTotalOutingSessions(productId),
-                new CareDiagnosisHomeResponse.ConditionSummary(
-                        diagnosisHomeSummary(ai, report),
-                        diagnosisHomeDescription(ai, report)),
+                diagnosisHomeCondition(report),
                 new CareDiagnosisHomeResponse.Environment30d(
                         report.getAvgTemperature(),
                         ruleEngine.temperatureLabel(report.getAvgTemperature()),
@@ -106,20 +101,20 @@ public class CareScreenService {
         Product product = getOwnedProduct(userId, productId);
         CareReport report = latestReportOrNull(productId);
         JsonNode ai = report == null ? null : aiCareSummary(report);
-        String careType = careType(ai, product);
-        CareGuide guide = findGuide(careType, product);
-        JsonNode aiCareGuide = path(ai, "llmCopy", "careGuide");
+        CareType careType = careType(ai, product, report);
+        CareGuide guide = careGuideRepository.findFirstByCareTypeAndActiveTrue(careType.code())
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "관리 가이드를 찾을 수 없습니다."));
 
         return new CareGuideResponse(
                 product.getId(),
                 product.getMaterialId(),
                 product.getMaterialDisplayName(),
-                careType,
+                careType.code(),
                 guide.getGuideImageUrl(),
                 guide.getTitle(),
-                firstText(path(aiCareGuide, "description"), textNode(guide.getDescription()), null),
-                firstList(path(aiCareGuide, "steps"), guide.getSteps()),
-                firstText(path(aiCareGuide, "tip"), path(aiCareGuide, "weeklyTip"), textNode(guide.getTip())));
+                guide.getDescription(),
+                guide.getSteps(),
+                guide.getTip());
     }
 
     private CareEnvironmentOverviewResponse.PeriodEnvironment periodEnvironment(
@@ -148,42 +143,35 @@ public class CareScreenService {
                 interpretation(period, aggregate, outingCount, shockCount));
     }
 
-    private CareGuide findGuide(String careType, Product product) {
-        CareGuide typeGuide = careGuideRepository.findFirstByCareTypeAndActiveTrue(careType).orElse(null);
-        if (typeGuide != null) {
-            return typeGuide;
+    private CareType careType(JsonNode ai, Product product, CareReport report) {
+        CareType defaultType = "natural_leather".equals(product.getMaterialId())
+                ? CareType.VENTILATED_SHADE_STORAGE : CareType.DRY_SOFT_CLOTH_WIPE;
+        // Missing observations do not establish humidity, impact or long-term storage.
+        if (report == null || !"SUFFICIENT".equals(report.getDataStatus())
+                || report.getConditionGrade() == CareConditionGrade.COLLECTING_DATA) {
+            return defaultType;
         }
+        CareType explicit = CareType.fromCode(text(path(ai, "llmCopy", "careGuide", "careType")));
+        if (explicit != null) return explicit;
 
-        List<String> subtypes = product.getMaterialSubtypes() == null ? List.of() : product.getMaterialSubtypes();
-        for (String subtype : subtypes) {
-            CareGuide subtypeGuide = careGuideRepository
-                    .findFirstByMaterialIdAndMaterialSubtypeAndActiveTrue(product.getMaterialId(), subtype)
-                    .orElse(null);
-            if (subtypeGuide != null) {
-                return subtypeGuide;
-            }
-        }
-        return careGuideRepository.findFirstByMaterialIdAndMaterialSubtypeIsNullAndActiveTrue(product.getMaterialId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "관리 가이드를 찾을 수 없습니다."));
-    }
-
-    private String careType(JsonNode ai, Product product) {
-        String explicitCareType = text(path(ai, "llmCopy", "careGuide", "careType"));
-        if (CARE_TYPE_VENTILATED_SHADE_STORAGE.equals(explicitCareType)
-                || CARE_TYPE_DRY_SOFT_CLOTH_WIPE.equals(explicitCareType)) {
-            return explicitCareType;
-        }
-
-        String primaryFactor = text(path(ai, "productCondition", "primaryFactor"));
-        if ("temperature_heat".equals(primaryFactor)
-                || "humidity".equals(primaryFactor)
-                || "dryness".equals(primaryFactor)) {
-            return CARE_TYPE_VENTILATED_SHADE_STORAGE;
-        }
-        if ("natural_leather".equals(product.getMaterialId())) {
-            return CARE_TYPE_VENTILATED_SHADE_STORAGE;
-        }
-        return CARE_TYPE_DRY_SOFT_CLOTH_WIPE;
+        String primaryFactor = report.getPrimaryFactor();
+        if (primaryFactor == null) primaryFactor = text(path(ai, "productCondition", "primaryFactor"));
+        if (primaryFactor == null) return defaultType;
+        return switch (primaryFactor) {
+            // The Java fallback also uses humidity for low-humidity readings.
+            case "humidity" -> report.getAvgHumidity() != null
+                    && report.getAvgHumidity().compareTo(BigDecimal.valueOf(40)) < 0
+                    ? CareType.AVOID_DRY_STORAGE : CareType.VENTILATED_HUMIDITY_DRY;
+            case "dryness" -> CareType.AVOID_DRY_STORAGE;
+            // The legacy fallback uses temperature_heat for both cold and hot readings.
+            case "temperature_heat" -> report.getAvgTemperature() != null
+                    && report.getAvgTemperature().compareTo(BigDecimal.valueOf(28)) > 0
+                    ? CareType.AVOID_HEAT_COOL_DOWN : defaultType;
+            case "handling" -> orZero(report.getShockCount()) > 0 ? CareType.SHOCK_IMPACT_CHECK : defaultType;
+            // usage_rest alone cannot distinguish overuse from long-term storage.
+            // Long-term storage is selected only by an explicit supported AI careType.
+            default -> defaultType;
+        };
     }
 
     private String interpretation(SensorPeriod period, SensorAggregate aggregate, int outingCount, int shockCount) {
@@ -225,22 +213,22 @@ public class CareScreenService {
         }
     }
 
-    private String diagnosisHomeSummary(JsonNode ai, CareReport report) {
-        return firstText(
-                path(ai, "llmCopy", "diagnosisHome", "short"),
-                path(ai, "explanation", "short"),
-                textNode(report.getSummaryText()));
-    }
-
-    private String diagnosisHomeDescription(JsonNode ai, CareReport report) {
-        List<String> bullets = stringList(path(ai, "llmCopy", "diagnosisHome", "reasonBullets"));
-        if (bullets.isEmpty()) {
-            bullets = stringList(path(ai, "explanation", "reasonBullets"));
-        }
-        if (!bullets.isEmpty()) {
-            return String.join(" ", bullets);
-        }
-        return report.getAnalysisText();
+    private CareDiagnosisHomeResponse.ConditionSummary diagnosisHomeCondition(CareReport report) {
+        CareConditionGrade grade = "SUFFICIENT".equals(report.getDataStatus())
+                && report.getConditionGrade() != null
+                ? report.getConditionGrade() : CareConditionGrade.COLLECTING_DATA;
+        return switch (grade) {
+            case COLLECTING_DATA -> new CareDiagnosisHomeResponse.ConditionSummary(
+                    "센서 데이터를 모으고 있습니다.", "최근 기록이 더 쌓이면 관리 상태를 알려드릴게요.");
+            case STABLE -> new CareDiagnosisHomeResponse.ConditionSummary(
+                    "안정적으로 유지되고 있습니다.", "최근 환경과 사용 기록이 권장 범위에 있습니다.");
+            case BALANCED -> new CareDiagnosisHomeResponse.ConditionSummary(
+                    "균형 있게 유지되고 있습니다.", "최근 환경과 사용 기록이 안정적인 범위에 있습니다.");
+            case LIGHT_CARE -> new CareDiagnosisHomeResponse.ConditionSummary(
+                    "가벼운 관리가 필요합니다.", "최근 기록에 맞춰 보관 환경과 사용 습관을 살펴봐주세요.");
+            case EXPERT_CHECK -> new CareDiagnosisHomeResponse.ConditionSummary(
+                    "전문가의 확인을 권장합니다.", "최근 환경과 사용 기록에서 점검이 필요한 신호가 있습니다.");
+        };
     }
 
     private String careReportSummary(JsonNode ai, CareReport report) {
@@ -317,13 +305,6 @@ public class CareScreenService {
                 .toList();
     }
 
-    private List<String> firstList(JsonNode node, List<String> fallback) {
-        List<String> values = stringList(node);
-        if (!values.isEmpty()) {
-            return values;
-        }
-        return fallback == null ? List.of() : fallback;
-    }
 
     private static int orZero(Integer value) {
         return value == null ? 0 : value;

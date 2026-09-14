@@ -6,6 +6,8 @@ import com.mxis.server.care.dto.AiCareSummaryResponse;
 import com.mxis.server.care.entity.CareReport;
 import com.mxis.server.care.repository.CareAlgorithmRepository;
 import com.mxis.server.care.repository.CareReportRepository;
+import com.mxis.server.care.repository.CareGuideRepository;
+import com.mxis.server.common.enums.CareType;
 import com.mxis.server.care.dto.SensorPeriod;
 import com.mxis.server.care.service.CareDecisionPolicy;
 import com.mxis.server.care.service.CareRuleEngine;
@@ -50,6 +52,7 @@ class MariaDbRepositoryIntegrationTest {
     @Autowired private CareAlgorithmRepository algorithmRepository;
     @Autowired private CareReportRepository reportRepository;
     @Autowired private SensorReadingRepository sensorRepository;
+    @Autowired private CareGuideRepository guideRepository;
 
     @Test
     void migrationsApplyAndJpaValidatesEntireSchema() {
@@ -57,6 +60,23 @@ class MariaDbRepositoryIntegrationTest {
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE success = false", Integer.class)).isZero();
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM flyway_schema_history WHERE type = 'SQL'", Integer.class)).isGreaterThanOrEqualTo(14);
+    }
+
+    @Test
+    void migrationProvidesAllSevenGuidesWithMatchingImagesAndCompleteCopy() {
+        for (CareType type : CareType.values()) {
+            var guide = guideRepository.findFirstByCareTypeAndActiveTrue(type.code()).orElseThrow();
+            assertThat(guide.getGuideImageUrl()).isEqualTo("http://161.33.38.65:8080/images/" + type.code() + ".png");
+            assertThat(guide.getTitle()).isNotBlank();
+            assertThat(guide.getDescription()).isNotBlank();
+            assertThat(guide.getSteps()).hasSize(3).allSatisfy(step -> assertThat(step).isNotBlank());
+            assertThat(guide.getTip()).isNotBlank();
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM care_guides WHERE care_type = ? AND is_active = true", Integer.class, type.code()))
+                    .isEqualTo(1);
+        }
+        assertThat(guideRepository.findFirstByCareTypeAndActiveTrue("ventilated_shade_storage").orElseThrow().getTitle())
+                .isEqualTo("직사광선을 피해 통풍이 잘되는 곳에 보관하세요.");
     }
 
     @Test
