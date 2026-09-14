@@ -71,7 +71,8 @@ class ReservationControllerTest {
 
     private ReservationResponse sampleReservation() {
         return new ReservationResponse(100L, 20L, "MCM Aren Shopper", 1L, "MCM 청담 플래그십",
-                "서울 강남구 압구정로 452", "02-1234-5678", 5L, "가죽 컨디셔닝", ReservationType.FREE,
+                "서울 강남구 압구정로 452", "02-1234-5678", "https://example.com/stores/1",
+                5L, "가죽 컨디셔닝", ReservationType.FREE,
                 RESERVED_DATE, RESERVED_TIME, "모서리 마모가 신경쓰여요",
                 ReservationStatus.CONFIRMED, null, null, LocalDateTime.now(), LocalDateTime.now());
     }
@@ -96,6 +97,7 @@ class ReservationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.id", is(100)))
                 .andExpect(jsonPath("$.data.status", is("CONFIRMED")))
+                .andExpect(jsonPath("$.data.storeUrl", is("https://example.com/stores/1")))
                 // 명세상 시각은 "HH:mm" - Jackson 기본값인 "14:00:00"으로 나가면 안 된다.
                 .andExpect(jsonPath("$.data.reservedTime", is("14:00")));
     }

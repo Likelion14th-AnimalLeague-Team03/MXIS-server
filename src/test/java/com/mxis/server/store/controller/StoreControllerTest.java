@@ -49,7 +49,8 @@ class StoreControllerTest {
 
     private StoreResponse sampleStore(BigDecimal distanceKm) {
         return new StoreResponse(1L, "MCM 청담 플래그십", "서울 강남구 압구정로 452", "02-1234-5678",
-                new BigDecimal("37.5262"), new BigDecimal("127.0396"), "월-금 10:00-19:00", distanceKm);
+                new BigDecimal("37.5262"), new BigDecimal("127.0396"), "월-금 10:00-19:00",
+                "https://example.com/stores/1", distanceKm);
     }
 
     @Test
@@ -65,6 +66,7 @@ class StoreControllerTest {
         mockMvc.perform(get("/api/v1/stores").header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].storeName", is("MCM 청담 플래그십")))
+                .andExpect(jsonPath("$.data[0].storeUrl", is("https://example.com/stores/1")))
                 .andExpect(jsonPath("$.data[0].distanceKm").doesNotExist());
     }
 

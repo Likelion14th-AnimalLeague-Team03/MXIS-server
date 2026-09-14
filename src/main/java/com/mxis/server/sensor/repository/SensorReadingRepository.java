@@ -12,6 +12,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface SensorReadingRepository extends JpaRepository<SensorReading, Long> {
 
+    @Query("""
+            SELECT sr FROM SensorReading sr JOIN FETCH sr.product p JOIN FETCH p.user
+            WHERE sr.device.id = :deviceId AND sr.sequenceNumber IN :sequenceNumbers
+            """)
+    List<SensorReading> findExistingReadings(@Param("deviceId") Long deviceId,
+                                            @Param("sequenceNumbers") List<Long> sequenceNumbers);
+
     Optional<SensorReading> findFirstByProductIdOrderByMeasuredAtDesc(Long productId);
 
     List<SensorReading> findByProductIdAndMeasuredAtGreaterThanEqualAndMeasuredAtLessThanOrderByMeasuredAtAsc(
@@ -27,12 +34,13 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     /** 진단·리포트용 기간 집계. from 이상, to 미만. */
     @Query("""
             SELECT new com.mxis.server.sensor.dto.SensorAggregate(
-                AVG(sr.temperature),
-                MAX(sr.temperature),
-                MIN(sr.temperature),
-                AVG(sr.humidity),
-                COUNT(sr),
-                SUM(CASE WHEN sr.humidity < :dryThreshold THEN 1L ELSE 0L END),
+                AVG(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100 THEN sr.temperature ELSE NULL END),
+                MAX(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100 THEN sr.temperature ELSE NULL END),
+                MIN(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100 THEN sr.temperature ELSE NULL END),
+                AVG(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100 THEN sr.humidity ELSE NULL END),
+                COUNT(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100 THEN sr.id ELSE NULL END),
+                SUM(CASE WHEN sr.temperature >= -273.15 AND sr.humidity BETWEEN 0 AND 100
+                              AND sr.humidity < :dryThreshold THEN 1L ELSE 0L END),
                 SUM(CASE WHEN sr.maxShockLevel >= :shockThreshold THEN 1L ELSE 0L END))
             FROM SensorReading sr
             WHERE sr.product.id = :productId
@@ -68,7 +76,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     @Query(value = """
             SELECT DATE(measured_at) AS day, AVG(humidity) AS avg_humidity
             FROM sensor_readings
-            WHERE product_id = :productId AND humidity IS NOT NULL
+            WHERE product_id = :productId AND temperature >= -273.15 AND humidity BETWEEN 0 AND 100
               AND measured_at >= :from AND measured_at < :to
             GROUP BY DATE(measured_at)
             ORDER BY day
@@ -84,7 +92,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
     @Query(value = """
             SELECT CAST(DATE_FORMAT(measured_at, '%Y-%m-01') AS DATE) AS month, AVG(humidity) AS avg_humidity
             FROM sensor_readings
-            WHERE product_id = :productId AND humidity IS NOT NULL
+            WHERE product_id = :productId AND temperature >= -273.15 AND humidity BETWEEN 0 AND 100
               AND measured_at >= :from AND measured_at < :to
             GROUP BY month
             ORDER BY month
@@ -93,12 +101,14 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
                                        @Param("from") LocalDateTime from,
                                        @Param("to") LocalDateTime to);
 
-    /** AI base API 데이터 충분성 판단용: [COUNT, MIN(measured_at), MAX(measured_at), MAX(synced_at)]. */
+    /** [valid environment count, first/last valid measurement, last sync, raw revision, raw count]. */
     @Query(value = """
-            SELECT COUNT(*) AS reading_count,
-                   MIN(measured_at) AS first_measured_at,
-                   MAX(measured_at) AS last_measured_at,
-                   MAX(synced_at) AS last_synced_at
+            SELECT COUNT(CASE WHEN temperature >= -273.15 AND humidity BETWEEN 0 AND 100 THEN 1 END) AS reading_count,
+                   MIN(CASE WHEN temperature >= -273.15 AND humidity BETWEEN 0 AND 100 THEN measured_at END) AS first_measured_at,
+                   MAX(CASE WHEN temperature >= -273.15 AND humidity BETWEEN 0 AND 100 THEN measured_at END) AS last_measured_at,
+                   MAX(synced_at) AS last_synced_at,
+                   MAX(id) AS sensor_revision,
+                   COUNT(*) AS raw_reading_count
             FROM sensor_readings
             WHERE product_id = :productId
               AND measured_at >= :from AND measured_at < :to
@@ -114,7 +124,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
                    AVG(humidity) AS avg_humidity,
                    COUNT(*) AS reading_count
             FROM sensor_readings
-            WHERE product_id = :productId
+            WHERE product_id = :productId AND temperature >= -273.15 AND humidity BETWEEN 0 AND 100
               AND measured_at >= :from AND measured_at < :to
             GROUP BY DATE(measured_at)
             ORDER BY bucket_day
@@ -130,7 +140,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
                    AVG(humidity) AS avg_humidity,
                    COUNT(*) AS reading_count
             FROM sensor_readings
-            WHERE product_id = :productId
+            WHERE product_id = :productId AND temperature >= -273.15 AND humidity BETWEEN 0 AND 100
               AND measured_at >= :from AND measured_at < :to
             GROUP BY bucket_index
             ORDER BY bucket_index
@@ -146,7 +156,7 @@ public interface SensorReadingRepository extends JpaRepository<SensorReading, Lo
                    AVG(humidity) AS avg_humidity,
                    COUNT(*) AS reading_count
             FROM sensor_readings
-            WHERE product_id = :productId
+            WHERE product_id = :productId AND temperature >= -273.15 AND humidity BETWEEN 0 AND 100
               AND measured_at >= :from AND measured_at < :to
             GROUP BY bucket_month
             ORDER BY bucket_month

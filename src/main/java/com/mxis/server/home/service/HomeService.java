@@ -4,8 +4,6 @@ import com.mxis.server.care.entity.CareReport;
 import com.mxis.server.care.entity.CareSuggestion;
 import com.mxis.server.care.repository.CareReportRepository;
 import com.mxis.server.care.repository.CareSuggestionRepository;
-import com.mxis.server.care.service.CareRuleEngine;
-import com.mxis.server.common.enums.CareConditionGrade;
 import com.mxis.server.common.enums.DeviceConnectionStatus;
 import com.mxis.server.common.enums.ReservationStatus;
 import com.mxis.server.common.exception.BusinessException;
@@ -20,6 +18,7 @@ import com.mxis.server.reservation.entity.Reservation;
 import com.mxis.server.reservation.repository.ReservationRepository;
 import com.mxis.server.user.entity.User;
 import com.mxis.server.user.repository.UserRepository;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -41,9 +40,11 @@ public class HomeService {
     private final CareReportRepository careReportRepository;
     private final CareSuggestionRepository careSuggestionRepository;
     private final ReservationRepository reservationRepository;
-    private final CareRuleEngine ruleEngine;
+    private final Clock clock;
 
     public HomeResponse getHome(Long userId, Long productId) {
+        LocalDateTime now = LocalDateTime.now(clock);
+        LocalDate today = now.toLocalDate();
         User user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         Product product = productRepository.findActiveById(productId)
@@ -64,24 +65,26 @@ public class HomeService {
         if (report == null) {
             state = HomeResponse.ProductState.COLLECTING;
             headline = "Charm과 함께 제품을 사용하면 환경과 사용 기록이 차곡차곡 쌓입니다.";
-        } else if (device == null || device.getLastSyncedAt() == null
-                || device.getLastSyncedAt().isBefore(LocalDateTime.now().minusDays(STALE_SYNC_DAYS))) {
+        } else if (!"SUFFICIENT".equals(report.getDataStatus()) && !"STALE_DATA".equals(report.getDataStatus())) {
+            state = HomeResponse.ProductState.COLLECTING;
+            headline = report.getSummaryText() == null
+                    ? "정확한 분석을 위해 센서 데이터를 수집하고 있습니다." : report.getSummaryText();
+        } else if ("STALE_DATA".equals(report.getDataStatus()) || device == null || device.getLastSyncedAt() == null
+                || device.getLastSyncedAt().isBefore(now.minusDays(STALE_SYNC_DAYS))
+                || report.getPeriodEnd() == null || report.getPeriodEnd().isBefore(now.minusDays(STALE_SYNC_DAYS))) {
             state = HomeResponse.ProductState.NEEDS_UPDATE;
             headline = "새로운 케어 데이터를 기다리고 있어요. 정확한 케어 상태를 확인하려면 Charm을 연동해주세요.";
         } else {
-            state = HomeResponse.ProductState.NORMAL;
-            CareConditionGrade grade = report.getConditionGrade();
-            score = toScore(grade);
-            // TODO(파이썬 AI 서비스 연동 예정): 지금은 룰 기반 문구로 대체.
-            // LIGHT_CARE 이상 등급만 CareSuggestion이 존재하므로, 없으면 등급 요약 문구로 폴백.
-            headline = careSuggestionRepository.findLatestActiveByProductId(productId)
+            state = report.getConditionScore() == null ? HomeResponse.ProductState.COLLECTING : HomeResponse.ProductState.NORMAL;
+            score = report.getConditionScore();
+            headline = careSuggestionRepository.findLatestActiveByProductId(productId, now)
                     .map(CareSuggestion::getMessage)
-                    .orElse(ruleEngine.summaryText(grade));
+                    .orElse(report.getSummaryText());
         }
 
         Reservation upcoming = reservationRepository
                 .findFirstByProductIdAndStatusAndReservedDateGreaterThanEqualOrderByReservedDateAscReservedTimeAsc(
-                        productId, ReservationStatus.CONFIRMED, LocalDate.now())
+                        productId, ReservationStatus.CONFIRMED, today)
                 .orElse(null);
 
         boolean charmNeedsReconnect = device == null || device.getConnectionStatus() != DeviceConnectionStatus.CONNECTED;
@@ -92,31 +95,21 @@ public class HomeService {
                 state,
                 score,
                 headline,
-                daysTogether(product),
+                daysTogether(product, today),
                 upcoming == null ? null : new HomeResponse.UpcomingReservation(
                         upcoming.getId(),
-                        (int) ChronoUnit.DAYS.between(LocalDate.now(), upcoming.getReservedDate()),
+                        (int) ChronoUnit.DAYS.between(today, upcoming.getReservedDate()),
                         upcoming.getReservedDate(),
                         upcoming.getReservedTime(),
                         upcoming.getStore().getStoreName()),
                 charmNeedsReconnect);
     }
 
-    // ponytail: 등급당 실제 점수가 없어 25% 단위 4단계로 균등 매핑. 실측 근거 생기면 조정.
-    static int toScore(CareConditionGrade grade) {
-        return switch (grade) {
-            case STABLE -> 100;
-            case BALANCED -> 75;
-            case LIGHT_CARE -> 50;
-            case EXPERT_CHECK -> 25;
-        };
-    }
-
     /** products.purchased_at(없으면 등록일) 기준 함께한 일수. */
-    static int daysTogether(Product product) {
+    static int daysTogether(Product product, LocalDate today) {
         LocalDate since = product.getPurchasedAt() != null
                 ? product.getPurchasedAt()
                 : product.getRegisteredAt().toLocalDate();
-        return (int) Math.max(0, ChronoUnit.DAYS.between(since, LocalDate.now()));
+        return (int) Math.max(0, ChronoUnit.DAYS.between(since, today));
     }
 }

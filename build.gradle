@@ -54,5 +54,24 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		excludeTags 'integration'
+	}
+}
+
+tasks.register('integrationTest', Test) {
+	description = 'Runs Flyway and JPA integration tests against a dedicated MariaDB database.'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'integration'
+	}
+	shouldRunAfter tasks.named('test')
+	outputs.upToDateWhen { false }
+	doFirst {
+		if (!System.getenv('TEST_DB_URL')) {
+			throw new GradleException('Set TEST_DB_URL to a dedicated test MariaDB database before running integrationTest.')
+		}
+	}
 }

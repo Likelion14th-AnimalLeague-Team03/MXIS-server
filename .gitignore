@@ -5,3 +5,15 @@ erd.md
 application.yml
 application-local.yml
 .idea/workspace.xml
+
+# Generated Gradle files
+.gradle/
+build/
+
+# Local tooling and secrets
+.DS_Store
+*.iml
+.env
+.env.*
+!.env.example
+*.log

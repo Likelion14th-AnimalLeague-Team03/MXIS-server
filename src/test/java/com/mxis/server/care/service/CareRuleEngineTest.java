@@ -84,7 +84,9 @@ class CareRuleEngineTest {
     }
 
     @Test
-    void humidityGrade_nullTreatedAsIdeal() {
-        assertThat(engine.humidityGrade(null)).isEqualTo(HumidityGrade.IDEAL);
+    void missingHumidityDoesNotBecomeAnIdealCondition() {
+        assertThat(engine.humidityGrade(null)).isEqualTo(HumidityGrade.UNKNOWN);
+        assertThat(engine.conditionGrade(engine.humidityGrade(null), ShockGrade.LOW))
+                .isEqualTo(CareConditionGrade.COLLECTING_DATA);
     }
 }

@@ -1,5 +1,8 @@
 # MXIS API 명세서 (통합본)
 
+> 진단·센서 리팩토링의 변경 계약과 DB 적용 사항은 [backend-refactoring.md](docs/backend-refactoring.md)를 참조하세요. 요약 조회는 저장 결과를 사용하며 외부 AI를 직접 호출하지 않습니다.
+
+
 > 2026-08-17에 한 번 Device/Product/Sensor/Care/Store/Reservation 8개 도메인 섹션을 통째로 삭제했었으나(당시 note: "git 히스토리에서 찾을 수 있다"), 실제로는 api-spec.md가 애초에 `.gitignore` 대상이라 git에 커밋된 적이 없어 예전 버전은 존재하지 않았다. 같은 날 프로젝트 전체 컨트롤러/서비스/DTO를 다시 읽어 5~10장으로 전부 복원했다 — 지금 문서는 실제 코드(2026-08-17 기준) 그대로다.
 > 로그인 2개(카카오 로그인·회원가입) 엔드포인트는 현재 코드에서 비활성화 상태다.
 
@@ -15,7 +18,7 @@
 | Notification (알림) | ✅ 개발 완료 (2026-08-17 신규) | 설정 저장은 Member API 재사용 + 알림 목록/읽음 처리 REST API 5개 + 내부 발송 트리거 |
 | Device (기기) | ✅ 개발 완료 | 등록/조회/상태갱신/삭제 + BLE 정책 + 기기관리 요약 |
 | Product (제품) | ✅ 개발 완료 | DPP 인식(스텁)/등록/조회/대표지정/삭제 + 제품-기기 N:M 연결 |
-| Sensor (센서) | ✅ 개발 완료 | 배치 동기화. 저장 시 진단 재계산·환경알림 트리거 동반 |
+| Sensor (센서) | ✅ 개발 완료 | 멱등 배치 동기화. 측정 당시 제품 귀속·비동기 진단 작업·환경알림 동반 |
 | Care (진단·제안·AI·가이드) | ✅ 개발 완료 | 규칙엔진 기반 진단 자동생성, AI 설명은 OpenAI 연동(옵션, 미설정 시 폴백 문구) |
 | Store (매장) | ✅ 개발 완료 | 목록(거리순)/예약 가능 시간 |
 | Reservation (예약) | ✅ 개발 완료 | 생성/조회/변경/취소. FREE·PAID 구분 필드 있음(PENDING_APPROVAL 상태는 정의만, 미사용) |
@@ -1701,7 +1704,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 | Endpoint | /api/v1/devices/{deviceId}/sensor-readings/batch |
 | Method | POST |
 | 권한 | User (기기 본인 소유) |
-| 설명 | BLE로 쌓인 측정치를 앱이 배치로 업로드한다. 저장과 동시에 진단 리포트를 재계산하고 환경 알림 여부를 검사한다. |
+| 설명 | BLE 측정치를 측정 당시의 제품에 배치 저장한다. 환경 알림을 검사하고 진단 작업을 함께 기록한다. 진단은 저장 커밋 후 별도 작업으로 실행된다. |
 
 ### Request
 ---
@@ -1709,14 +1712,14 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 
 | Key | Type | Required | Description |
 | --- | --- | --- | --- |
-| readings | `Array` | Y (1개 이상) | 아래 항목 배열 |
-| readings[].sequenceNumber | `Long` | Y | 기기 내부 측정 순번. (deviceId, sequenceNumber) 유니크 — 중복 재전송은 저장 전 걸러냄(멱등) |
-| readings[].temperature | `Decimal` | N | ℃ |
-| readings[].humidity | `Decimal` | N | % |
-| readings[].maxShockLevel | `Decimal` | N | 해당 구간 최대 충격량(g). ERD 컬럼 그대로 |
-| readings[].motionCount | `Integer` | N | ERD에는 없는 확장 필드 — 해당 구간 움직임 감지 횟수 |
+| readings | `Array` | Y (1~1000개) | 아래 항목 배열. null 항목 불가 |
+| readings[].sequenceNumber | `Long` | Y | 0 이상 기기 내부 순번. 동일 순번·동일 내용은 배치 내부 및 동시 재전송에서도 멱등 처리. 다른 내용은 409 |
+| readings[].temperature | `Decimal` | N | ℃. -273.15 이상, 정수 3자리, 소수 2자리 이내 |
+| readings[].humidity | `Decimal` | N | %. 0~100, 소수 2자리 이내 |
+| readings[].maxShockLevel | `Decimal` | N | 최대 충격량(g). 0 이상, 정수 3자리, 소수 3자리 이내 |
+| readings[].motionCount | `Integer` | N | 0 이상 움직임 감지 횟수 |
 | readings[].isOuting | `boolean` | Y (default false) | 측정 시점 외출/사용 상태 |
-| readings[].measuredAt | `DateTime` | Y | 실제 측정 시각 |
+| readings[].measuredAt | `DateTime` | Y | Asia/Seoul 기준 실제 측정 시각. 마이크로초 단위로 보존하며 서버 수신 시각보다 미래일 수 없음 |
 
 ### Response
 ---
@@ -1739,7 +1742,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 | --- | --- | --- |
 | receivedCount | `int` | 요청에 담긴 총 건수 |
 | savedCount | `int` | 실제 저장된(중복 제외) 건수 |
-| duplicateCount | `int` | sequenceNumber 중복으로 스킵된 건수 |
+| duplicateCount | `int` | 요청 내부 중복 및 기존 저장 재전송의 합계. 항상 receivedCount − savedCount |
 | lastSyncedAt | `DateTime` | 이번 동기화 완료 시각(= `devices.last_synced_at` 갱신값) |
 
 **발생할 수 있는 오류 코드**
@@ -1748,12 +1751,17 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 | --- | --- | --- |
 | 404 | DEVICE_NOT_FOUND | 기기 정보를 찾을 수 없습니다. |
 | 403 | DEVICE_NOT_OWNED | 본인 소유의 기기가 아닙니다. |
-| 409 | DEVICE_NOT_LINKED_TO_PRODUCT | 기기가 아직 제품에 연결되지 않아 센서 데이터를 저장할 수 없습니다. |
+| 409 | DEVICE_NOT_LINKED_TO_PRODUCT | 측정 시각에 해당하는 제품 연결 이력이 없습니다. |
+| 409 | CONFLICT | 같은 순번의 내용이 다르거나, 연결 이력이 중복되거나, 측정 당시 제품의 소유권이 유효하지 않음 |
+| 400 | INVALID_INPUT | 배치 크기·수치 범위·측정 시각이 올바르지 않음 |
 
-**부수 효과**
-- 저장 직후 같은 트랜잭션에서 `CareDiagnosisService.regenerate()`를 호출해 진단 리포트를 재계산한다 (활성 `care_algorithm`이 없거나 분석 기간 내 데이터가 없으면 조용히 스킵, 예외 없음).
-- `NotificationService.createEnvironmentAlertIfNeeded()`로 `ENVIRONMENT_ALERT` 알림 트리거를 검사한다 (조건: 4-1~4-5 절 "4개 트리거 → 토글 매핑" 표 참고).
-- ponytail: 위 두 부수 효과는 현재 요청과 같은 트랜잭션에서 동기 처리된다. 배치가 커져 응답이 느려지면 `@Async`로 분리 예정 (`SensorReadingService` 주석).
+**처리 규칙과 부수 효과**
+
+- 측정 시각이 연결 이력의 `[attachedAt, detachedAt)`에 해당하는 제품으로 저장한다. 지연 업로드는 과거 제품으로 귀속되며, 연결 공백·중복 이력은 임의로 보정하지 않는다. 오류가 있으면 배치 전체를 저장하지 않는다.
+- 동일 값의 소수 자릿수 차이(예: 20과 20.00)는 같은 내용으로 처리한다. 기기 재등록 시에도 순번은 기존 기록과 충돌할 수 있으므로, 다른 측정에 이전 순번을 재사용하면 409를 반환한다.
+- 새 측정값과 제품별 진단 작업을 같은 트랜잭션으로 확정한다. 순수 재전송은 새 진단·환경 알림을 생성하지 않는다.
+- 성공 응답은 센서 저장 완료를 의미하며, 새 AI 진단이 이미 완성됐음을 뜻하지 않는다. 작업자는 커밋된 데이터를 읽고 AI를 호출하며 실패 시 제한된 재시도를 수행한다. AI 장애가 센서 저장을 취소하지 않는다.
+- `NotificationService.createEnvironmentAlertIfNeeded()`로 새 측정값의 `ENVIRONMENT_ALERT` 조건을 제품별로 검사한다. 자세한 실행·운영 규칙은 [센서와 진단 작업 문서](docs/sensor-diagnosis-pipeline.md)를 참고한다.
 
 ---
 
@@ -1764,7 +1772,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 
 ### 진단 규칙 엔진 (모든 하위 API 공통 근거)
 
-`CareRuleEngine`이 AI 없이 산출하는 결정론적 등급이며, 아직 실 LLM 미연동이라 등급별 고정 문구를 그대로 저장/반환한다 (8-8 AI 설명 API만 예외 — 활성화 시 OpenAI가 이 등급을 문구로만 다듬는다).
+`CareDecisionPolicy`가 폴백 판정을 통합한다. Python AI가 활성화되면 검증된 실제 결과를 저장하고 모든 화면이 같은 저장 상태를 사용한다. 데이터가 부족하면 `COLLECTING_DATA`를 반환한다.
 
 **습도 등급** (평균 습도 %)
 
@@ -2029,7 +2037,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 | Endpoint | /api/v1/care/products/{productId}/summary |
 | Method | GET |
 | 권한 | User (제품 본인 소유) |
-| 설명 | 규칙 기반 스트레스 점수(0~100) + 데이터 충분성 판정 + 설명 문구. `OPENAI_API_KEY`/`MXIS_USE_OPENAI` 설정 시에만 문구를 실제 OpenAI로 다듬고, 미설정이거나 실패 시 결정론적 폴백 문구를 그대로 사용한다. |
+| 설명 | 분석 기간별 저장 결과를 반환한다. 센서 버전·원본 행 수가 같고 5분 이내인 결과를 재사용하며, 없으면 진단을 예약하고 공통 규칙의 폴백을 반환한다. 조회 요청에서 AI를 직접 호출하지 않는다. |
 
 ### Request
 ---
@@ -2050,7 +2058,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
     "productCondition": { "label": "Standard", "score": 84, "primaryFactor": "humidity", "summary": "최근 습도가 안정 범위를 벗어난 시간이 있어 보관 환경 조정이 권장됩니다." },
     "stressLabels": { "humidity": "CAUTION", "temperatureHeat": "LOW", "dryness": "LOW", "handling": "LOW", "usageRest": "LOW", "uvLight": "UNKNOWN" },
     "explanation": { "short": "최근 습도가 안정 범위를 벗어난 시간이 있어 보관 환경 조정이 권장됩니다.", "reasonBullets": ["..."], "sensorLimitations": ["MVP 센서는 UV/light를 직접 측정하지 않습니다.", "표면 손상, 곰팡이, 균열은 센서만으로 확정하지 않습니다."] },
-    "copyGeneration": { "source": "deterministic_fallback", "model": null, "error": null }
+    "copyGeneration": { "source": "openai", "model": "gpt-5-mini", "error": null }
   }
 }
 ```
@@ -2061,13 +2069,14 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 | --- | --- |
 | NO_DATA | 조회 기간 내 유효 측정치 0건 |
 | INSUFFICIENT_DATA | 유효 측정치 24건 미만, 또는 첫~마지막 측정 시각 간격이 24시간 미만 |
-| SUFFICIENT | 위 조건을 모두 만족 |
+| STALE_DATA | 최소 개수·기간은 충족하지만 마지막 유효 측정이 3일보다 오래됨 |
+| SUFFICIENT | 유효 온습도 측정 24개 이상, 측정 간격 24시간 이상, 최근 측정 조건 충족 |
 
 `SUFFICIENT`가 아니면 `productCondition.label`은 `"Collecting Data"`, `score`/`primaryFactor`는 null로 고정된다.
 
-**스코어 산출**: 100점에서 시작해 4개 스트레스 축(humidity/temperatureHeat/dryness/handling)의 `CAUTION`마다 -8점(그 외 등급 `ELEVATED` -18, `HIGH` -35, `INSPECTION_REQUIRED` -50 감점 룰도 존재하나 현재 판정 로직은 `LOW`/`CAUTION`/`ELEVATED`/`UNKNOWN`만 실사용). 85점 이상 `Excellent`, 60점 이상 `Standard`, 그 미만 `Needs Attention`.
+**스코어 산출**: AI 결과는 실제 점수를 보존한다. Java 폴백은 공통 판정 정책을 사용하며 STABLE=100, BALANCED=75, LIGHT_CARE=50, EXPERT_CHECK=25다. 데이터 부족·오래된 데이터는 `Collecting Data`와 null 점수를 반환한다.
 
-**`copyGeneration.source`**: `"deterministic_fallback"`(OpenAI 미사용 또는 실패) 또는 `"openai"`(실제 생성 성공). OpenAI 호출 실패 시 `explanation`은 폴백 문구가 그대로 유지되고 `copyGeneration.error`에 실패 사유(300자 제한)가 채워진다. OpenAI가 생성한 문구는 금칙어(손상되었습니다/곰팡이가 생겼습니다/확률/수리비/보증 등) 포함 시 서버가 거부하고 폴백으로 되돌아간다.
+**`copyGeneration.source`**: `deterministic_fallback`은 규칙 문구, `openai`는 AI 서비스의 생성 문구를 의미한다. 문구 생성 책임은 Python 서비스에 있으며 Java가 실패 후 별도의 OpenAI 요청을 보내지 않는다. 외부 호출 실패는 작업 메타데이터에 분류하며 원문 오류를 사용자 응답으로 노출하지 않는다.
 
 ---
 
@@ -2267,7 +2276,7 @@ Smart Charm이 수집한 원시 측정치를 배치 동기화한다. `SensorRead
 ```json
 { "success": true, "data": { "enabled": false, "apiKeyConfigured": false, "model": "gpt-5-mini", "timeoutSeconds": 45 } }
 ```
-값은 `application.yml`의 `mxis.ai.openai.*`(`MXIS_USE_OPENAI`/`OPENAI_API_KEY`/`OPENAI_MODEL`/`OPENAI_TIMEOUT_SECONDS` 환경변수)에서 온다. `enabled=true`이고 `apiKeyConfigured=true`일 때만 8-7에서 실제 OpenAI 호출을 시도한다.
+Java 직접 문구 생성 경로는 제거되었으므로 `enabled`는 항상 false다. 나머지 필드는 과거 로컬 설정의 호환 정보이며 Python의 OpenAI 키 상태를 나타내지 않는다. 실제 문구 생성은 `mxis.ai.service`에 설정된 Python 서비스에서 수행한다.
 
 ---
 

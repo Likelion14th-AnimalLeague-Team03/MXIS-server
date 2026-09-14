@@ -13,6 +13,8 @@ import com.mxis.server.sensor.repository.SensorReadingRepository;
 import com.mxis.server.user.entity.User;
 import com.mxis.server.user.repository.UserRepository;
 import java.util.List;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,8 @@ public class ProductService {
     private final UserRepository userRepository;
     private final DppCatalogService dppCatalogService;
     private final SensorReadingRepository sensorReadingRepository;
+    private final ProductDeviceMutationLock mutationLock;
+    private final Clock clock;
 
     public ProductRecognizeResponse recognize(String dppCode) {
         return dppCatalogService.recognize(dppCode);
@@ -90,14 +94,16 @@ public class ProductService {
 
     @Transactional
     public void delete(Long userId, Long productId) {
-        User user = getActiveUser(userId);
+        User user = mutationLock.lockOwner(userId);
         Product product = getOwnedProduct(userId, productId);
 
         // 제품을 삭제하면 연결돼 있던 기기들도 함께 연결 해제 처리한다 (detached_at 기록).
         // 그렇지 않으면 삭제된 제품에 기기가 "연결된 상태"로 남는 정합성 문제가 생긴다.
-        for (ProductDevice link : productDeviceRepository.findActiveByProductId(productId)) {
-            link.detach();
-        }
+        List<ProductDevice> links = productDeviceRepository.findActiveByProductId(productId);
+        links.stream().map(link -> link.getDevice().getId()).distinct().sorted()
+                .forEach(deviceId -> mutationLock.lockOwnedDevice(userId, deviceId));
+        LocalDateTime detachedAt = LocalDateTime.now(clock);
+        links.forEach(link -> link.detach(detachedAt));
 
         user.clearPrimaryProductIf(product);
         product.softDelete();

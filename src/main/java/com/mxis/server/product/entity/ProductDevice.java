@@ -15,6 +15,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,10 +55,14 @@ public class ProductDevice extends BaseTimeEntity {
     private LocalDateTime detachedAt;
 
     public ProductDevice(Product product, Device device, ProductDeviceRole role) {
+        this(product, device, role, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+    }
+
+    public ProductDevice(Product product, Device device, ProductDeviceRole role, LocalDateTime attachedAt) {
         this.product = product;
         this.device = device;
         this.role = role == null ? ProductDeviceRole.SECONDARY : role;
-        this.attachedAt = LocalDateTime.now();
+        this.attachedAt = attachedAt.truncatedTo(ChronoUnit.MICROS);
     }
 
     public boolean isActive() {
@@ -76,6 +82,10 @@ public class ProductDevice extends BaseTimeEntity {
     }
 
     public void detach() {
-        this.detachedAt = LocalDateTime.now();
+        detach(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+    }
+
+    public void detach(LocalDateTime detachedAt) {
+        this.detachedAt = detachedAt.truncatedTo(ChronoUnit.MICROS);
     }
 }

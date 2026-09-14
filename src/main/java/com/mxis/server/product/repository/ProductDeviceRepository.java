@@ -10,6 +10,12 @@ import org.springframework.data.repository.query.Param;
 public interface ProductDeviceRepository extends JpaRepository<ProductDevice, Long> {
 
     @Query("""
+            SELECT pd FROM ProductDevice pd JOIN FETCH pd.product p JOIN FETCH p.user
+            WHERE pd.device.id = :deviceId ORDER BY pd.attachedAt, pd.id
+            """)
+    List<ProductDevice> findHistoryByDeviceId(@Param("deviceId") Long deviceId);
+
+    @Query("""
             SELECT pd FROM ProductDevice pd
             WHERE pd.product.id = :productId AND pd.detachedAt IS NULL
             ORDER BY pd.attachedAt DESC

@@ -2,11 +2,11 @@ package com.mxis.server.user.entity;
 
 import com.mxis.server.common.entity.BaseTimeEntity;
 import com.mxis.server.common.enums.AuthProvider;
+import com.mxis.server.common.enums.AuthProviderConverter;
 import com.mxis.server.product.entity.Product;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,7 +35,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "password_hash", length = 255)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = AuthProviderConverter.class)
     @Column(nullable = false, length = 20)
     private AuthProvider provider;
 

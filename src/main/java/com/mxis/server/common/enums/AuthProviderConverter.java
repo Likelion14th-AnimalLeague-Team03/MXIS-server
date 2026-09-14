@@ -17,6 +17,7 @@ public class AuthProviderConverter implements AttributeConverter<AuthProvider, S
 
     @Override
     public AuthProvider convertToEntityAttribute(String dbData) {
-        return dbData == null ? null : AuthProvider.fromValue(dbData);
+        // Earlier @Enumerated mappings wrote enum names; keep those existing rows readable.
+        return dbData == null ? null : AuthProvider.fromValue(dbData.toLowerCase(java.util.Locale.ROOT));
     }
 }

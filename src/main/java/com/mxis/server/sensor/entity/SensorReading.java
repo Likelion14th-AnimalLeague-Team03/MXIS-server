@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -73,6 +75,13 @@ public class SensorReading {
     public SensorReading(Product product, Device device, ProductDevice productDevice, Long sequenceNumber,
                           BigDecimal temperature, BigDecimal humidity, BigDecimal maxShockLevel,
                           Integer motionCount, boolean isOuting, LocalDateTime measuredAt) {
+        this(product, device, productDevice, sequenceNumber, temperature, humidity, maxShockLevel, motionCount,
+                isOuting, measuredAt, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+    }
+
+    public SensorReading(Product product, Device device, ProductDevice productDevice, Long sequenceNumber,
+                          BigDecimal temperature, BigDecimal humidity, BigDecimal maxShockLevel,
+                          Integer motionCount, boolean isOuting, LocalDateTime measuredAt, LocalDateTime syncedAt) {
         this.product = product;
         this.device = device;
         this.productDevice = productDevice;
@@ -82,7 +91,7 @@ public class SensorReading {
         this.maxShockLevel = maxShockLevel;
         this.motionCount = motionCount;
         this.isOuting = isOuting;
-        this.measuredAt = measuredAt;
-        this.syncedAt = LocalDateTime.now();
+        this.measuredAt = measuredAt.truncatedTo(ChronoUnit.MICROS);
+        this.syncedAt = syncedAt.truncatedTo(ChronoUnit.MICROS);
     }
 }

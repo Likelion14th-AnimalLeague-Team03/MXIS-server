@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 /**
- * 진단 규칙 엔진. 습도·충격 임계값 판정과 종합 등급 산출을 담당하며, AI는 여기에 관여하지 않는다.
- * (AI는 이 엔진이 낸 등급·라벨을 받아 문구만 다듬는 역할이며, 아직 연동 전이라 폴백 고정 문구를 쓴다.)
+ * AI 서비스 비활성화 또는 실패 시 사용하는 진단 임계값과 고정 안내 문구.
+ * CareDecisionPolicy가 이 규칙을 사용해 조회 응답과 저장 리포트에 동일한 폴백 판단을 적용한다.
  *
  * 임계값은 MCM 공식 케어 가이드(건조·서늘 보관, 마찰·충격 주의)를 수치로 옮긴 초기값이다.
  * 실제 참(charm) 센서의 측정 특성에 맞춰 조정해야 하는 캘리브레이션 값이므로 상수로 모아 둔다.
@@ -43,6 +43,7 @@ public class CareRuleEngine {
     private static final double DRY_MODERATE_MAX = 0.5;
 
     public enum HumidityGrade {
+        UNKNOWN("측정된 데이터가 없습니다", -1),
         DRY_RISK("건조 환경 노출", 2),
         SLIGHTLY_DRY("다소 건조한 환경", 1),
         IDEAL("이상적입니다", 0),
@@ -82,7 +83,7 @@ public class CareRuleEngine {
 
     public HumidityGrade humidityGrade(BigDecimal avgHumidity) {
         if (avgHumidity == null) {
-            return HumidityGrade.IDEAL;
+            return HumidityGrade.UNKNOWN;
         }
         if (avgHumidity.compareTo(DRY_RISK_MAX) < 0) {
             return HumidityGrade.DRY_RISK;
@@ -114,6 +115,7 @@ public class CareRuleEngine {
      * 두 축이 모두 최악(위험 습도 + 높은 충격)일 때만 EXPERT_CHECK로 한 단계 더 올린다.
      */
     public CareConditionGrade conditionGrade(HumidityGrade humidity, ShockGrade shock) {
+        if (humidity == HumidityGrade.UNKNOWN) return CareConditionGrade.COLLECTING_DATA;
         int severity = Math.max(humidity.severity, shock.severity);
         if (humidity.severity == 2 && shock.severity == 2) {
             return CareConditionGrade.EXPERT_CHECK;
@@ -150,10 +152,11 @@ public class CareRuleEngine {
     }
 
     // --- 등급별 고정 문구 (AI 폴백) ---------------------------------------------------
-    // 실제 LLM 연동 전까지는 이 문구가 그대로 저장되고, 연동 후에도 호출 실패 시 이 값이 남는다.
+    // AI 서비스가 제공되지 않으면 이 문구를 저장하고 반환한다.
 
     public String summaryText(CareConditionGrade grade) {
         return switch (grade) {
+            case COLLECTING_DATA -> "정확한 분석을 위해 센서 데이터를 수집하고 있습니다.";
             case STABLE -> "안정적인 상태입니다.";
             case BALANCED -> "균형 있게 유지되고 있습니다.";
             case LIGHT_CARE -> "가벼운 관리가 권장됩니다.";
@@ -163,6 +166,7 @@ public class CareRuleEngine {
 
     public String analysisText(CareConditionGrade grade) {
         return switch (grade) {
+            case COLLECTING_DATA -> "분석 기준을 충족하는 최근 센서 데이터가 더 필요합니다.";
             case STABLE -> "최근 환경과 사용 기록이 권장 범위 안에 있습니다.";
             case BALANCED -> "최근 환경과 사용 기록이 안정적인 범위에 있습니다.";
             case LIGHT_CARE -> "최근 사용 환경에서 관리가 필요할 수 있는 신호가 확인되었습니다.";
@@ -172,6 +176,7 @@ public class CareRuleEngine {
 
     public String recommendationText(CareConditionGrade grade) {
         return switch (grade) {
+            case COLLECTING_DATA -> "Charm을 연동하고 센서 데이터를 더 쌓아 주세요.";
             case STABLE -> "현재는 안정적으로 유지되고 있으나, 다음 계절 전 가벼운 점검을 권장합니다.";
             case BALANCED -> "지금의 보관 습관을 유지하시면 좋겠습니다.";
             case LIGHT_CARE -> "이번 계절이 지나기 전 가벼운 컨디션 점검을 권장합니다.";

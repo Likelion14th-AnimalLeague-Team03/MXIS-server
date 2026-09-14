@@ -1,6 +1,8 @@
 package com.mxis.server.care.entity;
 
 import com.mxis.server.common.entity.BaseCreatedAtEntity;
+import com.mxis.server.care.dto.AiCareSummaryResponse;
+import java.time.temporal.ChronoUnit;
 import com.mxis.server.common.enums.CareConditionGrade;
 import com.mxis.server.product.entity.Product;
 import jakarta.persistence.Column;
@@ -23,7 +25,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 진단 리포트 스냅샷. Immutable - INSERT 이후 수정하지 않고, 재진단은 새 행으로 쌓는다.
- * 30일 핵심 지표만 저장하며, 7일 건조노출·함께한시간 등은 조회 시점에 실시간 계산한다.
+ * 분석 기간별 판단·점수·입력 버전을 보존한다. 기본 케어 화면과 제안은 30일 스냅샷을 사용한다.
  */
 @Getter
 @Entity
@@ -62,6 +64,30 @@ public class CareReport extends BaseCreatedAtEntity {
     @Column(name = "period_end", nullable = false)
     private LocalDateTime periodEnd;
 
+    @Column(name = "analysis_window_days", nullable = false)
+    private int analysisWindowDays;
+
+    @Column(name = "data_status", nullable = false, length = 30)
+    private String dataStatus;
+
+    @Column(name = "condition_label", length = 30)
+    private String conditionLabel;
+
+    @Column(name = "condition_score")
+    private Integer conditionScore;
+
+    @Column(name = "primary_factor", length = 50)
+    private String primaryFactor;
+
+    @Column(name = "care_need", length = 30)
+    private String careNeed;
+
+    @Column(name = "inspection_need", length = 30)
+    private String inspectionNeed;
+
+    @Column(name = "sensor_revision")
+    private Long sensorRevision;
+
     @Column(name = "avg_temperature", precision = 5, scale = 2)
     private BigDecimal avgTemperature;
 
@@ -96,6 +122,9 @@ public class CareReport extends BaseCreatedAtEntity {
         this.recommendationText = recommendationText;
         this.periodStart = periodStart;
         this.periodEnd = periodEnd;
+        this.analysisWindowDays = (int) ChronoUnit.DAYS.between(periodStart, periodEnd);
+        this.dataStatus = "INSUFFICIENT_DATA";
+        this.conditionLabel = "Collecting Data";
         this.avgTemperature = avgTemperature;
         this.maxTemperature = maxTemperature;
         this.minTemperature = minTemperature;
@@ -118,6 +147,9 @@ public class CareReport extends BaseCreatedAtEntity {
         this.recommendationText = recommendationText;
         this.periodStart = periodStart;
         this.periodEnd = periodEnd;
+        this.analysisWindowDays = (int) ChronoUnit.DAYS.between(periodStart, periodEnd);
+        this.dataStatus = "INSUFFICIENT_DATA";
+        this.conditionLabel = "Collecting Data";
         this.avgTemperature = avgTemperature;
         this.maxTemperature = maxTemperature;
         this.minTemperature = minTemperature;
@@ -127,6 +159,26 @@ public class CareReport extends BaseCreatedAtEntity {
         this.aiOutput = aiOutput == null || aiOutput.isBlank()
                 ? minimalAiOutput(conditionGrade, summaryText, periodStart, periodEnd)
                 : aiOutput;
+    }
+
+    public CareReport(Product product, CareAlgorithm algorithm, CareConditionGrade conditionGrade,
+                      String summaryText, String analysisText, String recommendationText,
+                      LocalDateTime periodStart, LocalDateTime periodEnd,
+                      BigDecimal avgTemperature, BigDecimal maxTemperature, BigDecimal minTemperature,
+                      BigDecimal avgHumidity, Integer outingCount, Integer shockCount, String aiOutput,
+                      AiCareSummaryResponse summary, String careNeed, String inspectionNeed, Long sensorRevision) {
+        this(product, algorithm, conditionGrade, summaryText, analysisText, recommendationText,
+                periodStart, periodEnd, avgTemperature, maxTemperature, minTemperature,
+                avgHumidity, outingCount, shockCount, aiOutput);
+        this.analysisWindowDays = summary.analysisWindowDays();
+        this.dataStatus = summary.dataSufficiency().status();
+        this.conditionLabel = summary.productCondition().label();
+        this.conditionScore = "SUFFICIENT".equals(dataStatus) && conditionGrade != CareConditionGrade.COLLECTING_DATA
+                ? summary.productCondition().score() : null;
+        this.primaryFactor = summary.productCondition().primaryFactor();
+        this.careNeed = careNeed;
+        this.inspectionNeed = inspectionNeed;
+        this.sensorRevision = sensorRevision;
     }
 
     private static String minimalAiOutput(CareConditionGrade conditionGrade, String summaryText,

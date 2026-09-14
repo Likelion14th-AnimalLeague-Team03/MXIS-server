@@ -13,7 +13,6 @@ import com.mxis.server.care.entity.CareGuide;
 import com.mxis.server.care.entity.CareReport;
 import com.mxis.server.care.repository.CareGuideRepository;
 import com.mxis.server.care.repository.CareReportRepository;
-import com.mxis.server.common.enums.CareConditionGrade;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.product.entity.Product;
@@ -23,6 +22,7 @@ import com.mxis.server.sensor.repository.SensorReadingRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +44,8 @@ public class CareScreenService {
     private final CareRuleEngine ruleEngine;
     private final CareQueryService careQueryService;
     private final ObjectMapper objectMapper;
+    private final CareDecisionPolicy decisionPolicy;
+    private final Clock clock;
 
     public CareDiagnosisHomeResponse getDiagnosisHome(Long userId, Long productId) {
         Product product = getOwnedProduct(userId, productId);
@@ -68,8 +70,10 @@ public class CareScreenService {
         getOwnedProduct(userId, productId);
         CareReport report = latestReport(productId);
         JsonNode ai = aiCareSummary(report);
-        boolean careNeeded = careNeeded(ai, report);
-        int careCycleMonths = careCycleMonths(ai, report.getConditionGrade());
+        boolean careNeeded = decisionPolicy.needsSuggestion(report.getDataStatus(), report.getCareNeed(),
+                report.getInspectionNeed(), report.getConditionGrade());
+        int careCycleMonths = decisionPolicy.careCycleMonths(report.getDataStatus(), report.getCareNeed(),
+                report.getInspectionNeed(), report.getConditionGrade());
         return new CareReportScreenResponse(
                 report.getId(),
                 report.getCreatedAt(),
@@ -86,15 +90,16 @@ public class CareScreenService {
                 interpretation(ai, report),
                 careNeeded,
                 careCycleMonths,
-                report.getPeriodEnd().toLocalDate().plusMonths(careCycleMonths));
+                careCycleMonths == 0 ? null : report.getPeriodEnd().toLocalDate().plusMonths(careCycleMonths));
     }
 
     public CareEnvironmentOverviewResponse getEnvironmentOverview(Long userId, Long productId) {
         getOwnedProduct(userId, productId);
+        LocalDateTime now = LocalDateTime.now(clock);
         return new CareEnvironmentOverviewResponse(
-                periodEnvironment(userId, productId, SensorPeriod.SEVEN_DAYS),
-                periodEnvironment(userId, productId, SensorPeriod.THIRTY_DAYS),
-                periodEnvironment(userId, productId, SensorPeriod.ONE_YEAR));
+                periodEnvironment(productId, SensorPeriod.SEVEN_DAYS, now),
+                periodEnvironment(productId, SensorPeriod.THIRTY_DAYS, now),
+                periodEnvironment(productId, SensorPeriod.ONE_YEAR, now));
     }
 
     public CareGuideResponse getGuide(Long userId, Long productId) {
@@ -118,14 +123,12 @@ public class CareScreenService {
     }
 
     private CareEnvironmentOverviewResponse.PeriodEnvironment periodEnvironment(
-            Long userId, Long productId, SensorPeriod period) {
-        CareEnvironmentResponse environment = careQueryService.getCareEnvironment(userId, productId, period);
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime from = period == SensorPeriod.ONE_YEAR ? now.minusYears(1) : now.minusDays(period.days());
-        SensorAggregate aggregate = sensorReadingRepository.aggregate(
-                productId, from, now,
-                CareRuleEngine.DRY_THRESHOLD, CareRuleEngine.STRONG_SHOCK_THRESHOLD);
-        int outingCount = (int) sensorReadingRepository.countOutingSessions(productId, from, now);
+            Long productId, SensorPeriod period, LocalDateTime now) {
+        CareQueryService.EnvironmentSnapshot snapshot = careQueryService.environmentSnapshot(productId, period, now);
+        CareEnvironmentResponse environment = snapshot.response();
+        SensorAggregate aggregate = snapshot.aggregate();
+        int outingCount = (int) sensorReadingRepository.countOutingSessions(
+                productId, snapshot.window().from(), snapshot.window().to());
         int shockCount = aggregate.shockCountAsInt();
 
         return new CareEnvironmentOverviewResponse.PeriodEnvironment(
@@ -265,19 +268,6 @@ public class CareScreenService {
                 textNode(report.getRecommendationText()));
     }
 
-    private boolean careNeeded(JsonNode ai, CareReport report) {
-        String careNeed = text(path(ai, "careDecision", "careNeed"));
-        String inspectionNeed = text(path(ai, "careDecision", "inspectionNeed"));
-        if (careNeed != null || inspectionNeed != null) {
-            return "REQUIRED".equals(inspectionNeed)
-                    || "CONDITIONAL".equals(inspectionNeed)
-                    || "MEDIUM".equals(careNeed)
-                    || "MEDIUM_HIGH".equals(careNeed)
-                    || "HIGH".equals(careNeed);
-        }
-        return ruleEngine.needsSuggestion(report.getConditionGrade());
-    }
-
     private Product getOwnedProduct(Long userId, Long productId) {
         Product product = productRepository.findActiveById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -285,29 +275,6 @@ public class CareScreenService {
             throw new BusinessException(ErrorCode.PRODUCT_NOT_OWNED);
         }
         return product;
-    }
-
-    private int careCycleMonths(JsonNode ai, CareConditionGrade grade) {
-        String careNeed = text(path(ai, "careDecision", "careNeed"));
-        String inspectionNeed = text(path(ai, "careDecision", "inspectionNeed"));
-        if ("REQUIRED".equals(inspectionNeed) || "HIGH".equals(careNeed)) {
-            return 1;
-        }
-        if ("CONDITIONAL".equals(inspectionNeed) || "MEDIUM_HIGH".equals(careNeed) || "MEDIUM".equals(careNeed)) {
-            return 3;
-        }
-        if ("LOW_MEDIUM".equals(careNeed)) {
-            return 6;
-        }
-        return careCycleMonths(grade);
-    }
-
-    private int careCycleMonths(CareConditionGrade grade) {
-        return switch (grade) {
-            case STABLE, BALANCED -> 6;
-            case LIGHT_CARE -> 3;
-            case EXPERT_CHECK -> 1;
-        };
     }
 
     private JsonNode path(JsonNode node, String... fieldNames) {

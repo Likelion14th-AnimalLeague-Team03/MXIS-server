@@ -4,7 +4,6 @@ import com.mxis.server.common.enums.ProductDeviceRole;
 import com.mxis.server.common.exception.BusinessException;
 import com.mxis.server.common.exception.ErrorCode;
 import com.mxis.server.device.entity.Device;
-import com.mxis.server.device.repository.DeviceRepository;
 import com.mxis.server.product.dto.ProductDeviceLinkRequest;
 import com.mxis.server.product.dto.ProductDeviceResponse;
 import com.mxis.server.product.entity.Product;
@@ -12,6 +11,8 @@ import com.mxis.server.product.entity.ProductDevice;
 import com.mxis.server.product.repository.ProductDeviceRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductDeviceService {
 
     private final ProductDeviceRepository productDeviceRepository;
-    private final DeviceRepository deviceRepository;
     private final ProductService productService;
     private final EntityManager entityManager;
+    private final ProductDeviceMutationLock mutationLock;
+    private final Clock clock;
 
     @Transactional
     public ProductDeviceResponse link(Long userId, Long productId, ProductDeviceLinkRequest request) {
+        mutationLock.lockOwner(userId);
+        Device device = mutationLock.lockOwnedDevice(userId, request.deviceId());
         Product product = productService.getOwnedProduct(userId, productId);
-        Device device = getOwnedDevice(userId, request.deviceId());
 
         if (productDeviceRepository.findActiveByProductIdAndDeviceId(productId, device.getId()).isPresent()) {
             throw new BusinessException(ErrorCode.DEVICE_ALREADY_LINKED);
@@ -47,7 +50,7 @@ public class ProductDeviceService {
                     "이미 대표 센서가 지정되어 있습니다. 변경하려면 대표 센서 변경 API를 사용하세요.");
         }
 
-        ProductDevice link = new ProductDevice(product, device, requestedRole);
+        ProductDevice link = new ProductDevice(product, device, requestedRole, LocalDateTime.now(clock));
         return ProductDeviceResponse.from(productDeviceRepository.save(link));
     }
 
@@ -60,6 +63,8 @@ public class ProductDeviceService {
 
     @Transactional
     public ProductDeviceResponse promoteToPrimary(Long userId, Long productId, Long deviceId) {
+        mutationLock.lockOwner(userId);
+        mutationLock.lockOwnedDevice(userId, deviceId);
         productService.getOwnedProduct(userId, productId);
 
         ProductDevice target = productDeviceRepository.findActiveByProductIdAndDeviceId(productId, deviceId)
@@ -87,20 +92,14 @@ public class ProductDeviceService {
 
     @Transactional
     public void unlink(Long userId, Long productId, Long deviceId) {
+        mutationLock.lockOwner(userId);
+        mutationLock.lockOwnedDevice(userId, deviceId);
         productService.getOwnedProduct(userId, productId);
 
         ProductDevice link = productDeviceRepository.findActiveByProductIdAndDeviceId(productId, deviceId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_DEVICE_LINK_NOT_FOUND));
 
-        link.detach();
+        link.detach(LocalDateTime.now(clock));
     }
 
-    private Device getOwnedDevice(Long userId, Long deviceId) {
-        Device device = deviceRepository.findActiveById(deviceId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.DEVICE_NOT_FOUND));
-        if (!device.isOwnedBy(userId)) {
-            throw new BusinessException(ErrorCode.DEVICE_NOT_OWNED);
-        }
-        return device;
-    }
 }
