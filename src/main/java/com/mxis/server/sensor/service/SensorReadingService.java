@@ -59,7 +59,15 @@ public class SensorReadingService {
         Map<Long, SensorReading> existing = sensorReadingRepository
                 .findExistingReadings(deviceId, List.copyOf(unique.keySet())).stream()
                 .collect(Collectors.toMap(SensorReading::getSequenceNumber, Function.identity()));
-        List<ProductDevice> history = productDeviceRepository.findHistoryByDeviceId(deviceId);
+        // ponytail: 측정 시각별 연결 이력 검증 대신, 지금 활성 연결 하나를 배치 전체에 적용한다
+        // (연결 껐다켰다 하는 실물기기 테스트에서 짧은 공백 시간 데이터가 배치를 통째로 거부시키는
+        // 문제의 임시 완화책 — 기기를 다른 상품으로 옮긴 직후 동기화되는 잔여 데이터가 새 상품에
+        // 잘못 귀속될 수 있는 트레이드오프가 있음, 정식 해결책은 후속 작업으로 남긴다).
+        List<ProductDevice> activeLinks = productDeviceRepository.findActiveByDeviceId(deviceId);
+        if (activeLinks.isEmpty()) {
+            throw new BusinessException(ErrorCode.DEVICE_NOT_LINKED_TO_PRODUCT);
+        }
+        ProductDevice link = activeLinks.get(0);
         List<SensorReading> toSave = new ArrayList<>();
         for (SensorReadingItem item : unique.values()) {
             SensorReading replay = existing.get(item.sequenceNumber());
@@ -71,7 +79,6 @@ public class SensorReadingService {
                 }
                 continue;
             }
-            ProductDevice link = measurementLink(userId, item.measuredAt(), history);
             toSave.add(new SensorReading(link.getProduct(), device, link, item.sequenceNumber(),
                     item.temperature(), item.humidity(), item.maxShockLevel(), item.motionCount(),
                     item.isOuting(), item.measuredAt(), syncedAt));
@@ -90,25 +97,6 @@ public class SensorReadingService {
         });
         return new SensorReadingBatchResponse(request.readings().size(), toSave.size(),
                 request.readings().size() - toSave.size(), syncedAt);
-    }
-
-    private ProductDevice measurementLink(Long userId, LocalDateTime measuredAt, List<ProductDevice> history) {
-        List<ProductDevice> matches = history.stream()
-                .filter(link -> !measuredAt.isBefore(link.getAttachedAt())
-                        && (link.getDetachedAt() == null || measuredAt.isBefore(link.getDetachedAt())))
-                .toList();
-        if (matches.isEmpty()) {
-            throw new BusinessException(ErrorCode.DEVICE_NOT_LINKED_TO_PRODUCT,
-                    "측정 시각에 해당하는 제품 연결 이력이 없습니다.");
-        }
-        if (matches.size() != 1) {
-            throw new BusinessException(ErrorCode.CONFLICT, "측정 시각의 제품 연결 이력이 중복되어 귀속을 결정할 수 없습니다.");
-        }
-        ProductDevice link = matches.get(0);
-        if (!link.getProduct().isOwnedBy(userId) || link.getProduct().isDeleted()) {
-            throw new BusinessException(ErrorCode.CONFLICT, "측정 당시 제품이 현재 회원의 사용 가능한 제품이 아닙니다.");
-        }
-        return link;
     }
 
     private static BusinessException sequenceConflict() {
