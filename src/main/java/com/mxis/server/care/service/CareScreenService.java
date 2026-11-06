@@ -160,12 +160,12 @@ public class CareScreenService {
         return switch (primaryFactor) {
             // The Java fallback also uses humidity for low-humidity readings.
             case "humidity" -> report.getAvgHumidity() != null
-                    && report.getAvgHumidity().compareTo(BigDecimal.valueOf(40)) < 0
+                    && ruleEngine.isBelowIdealHumidity(report.getAvgHumidity())
                     ? CareType.AVOID_DRY_STORAGE : CareType.VENTILATED_HUMIDITY_DRY;
             case "dryness" -> CareType.AVOID_DRY_STORAGE;
             // The legacy fallback uses temperature_heat for both cold and hot readings.
             case "temperature_heat" -> report.getAvgTemperature() != null
-                    && report.getAvgTemperature().compareTo(BigDecimal.valueOf(28)) > 0
+                    && ruleEngine.isAboveIdealTemperature(report.getAvgTemperature())
                     ? CareType.AVOID_HEAT_COOL_DOWN : defaultType;
             case "handling" -> orZero(report.getShockCount()) > 0 ? CareType.SHOCK_IMPACT_CHECK : defaultType;
             // usage_rest alone cannot distinguish overuse from long-term storage.

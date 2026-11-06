@@ -2,26 +2,27 @@ package com.mxis.server.care.service;
 
 import com.mxis.server.common.enums.CareConditionGrade;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 
 /**
  * AI 서비스 비활성화 또는 실패 시 사용하는 진단 임계값과 고정 안내 문구.
  * CareDecisionPolicy가 이 규칙을 사용해 조회 응답과 저장 리포트에 동일한 폴백 판단을 적용한다.
  *
- * 임계값은 MCM 공식 케어 가이드(건조·서늘 보관, 마찰·충격 주의)를 수치로 옮긴 초기값이다.
- * 실제 참(charm) 센서의 측정 특성에 맞춰 조정해야 하는 캘리브레이션 값이므로 상수로 모아 둔다.
+ * 온·습도 임계값은 앱 판정 기준(MXIS-FE care/status.ts의 기획 표)과 맞춘 값이며, 바꿀 때는 앱도 함께 바꾼다.
+ * 충격 임계값은 실제 참(charm) 센서의 측정 특성에 맞춰 조정해야 하는 캘리브레이션 값이다.
  */
 @Component
 public class CareRuleEngine {
 
     // 습도 구간 (%)
     private static final BigDecimal DRY_RISK_MAX = BigDecimal.valueOf(30);
-    private static final BigDecimal IDEAL_MIN = BigDecimal.valueOf(40);
-    private static final BigDecimal IDEAL_MAX = BigDecimal.valueOf(60);
-    private static final BigDecimal HUMID_RISK_MIN = BigDecimal.valueOf(70);
+    private static final BigDecimal IDEAL_MIN = BigDecimal.valueOf(45);
+    private static final BigDecimal IDEAL_MAX = BigDecimal.valueOf(55);
+    private static final BigDecimal HUMID_RISK_MIN = BigDecimal.valueOf(65);
 
     /** 건조 노출 판정 기준 습도. 이 값 미만인 측정을 "건조 환경 노출"로 센다. */
-    public static final BigDecimal DRY_THRESHOLD = IDEAL_MIN;
+    public static final BigDecimal DRY_THRESHOLD = BigDecimal.valueOf(40);
 
     /**
      * "강한 충격"으로 집계할 최소 충격량(g). V2__seed_data.sql의 rule_config.shock_threshold와 맞춘 값이다.
@@ -35,8 +36,10 @@ public class CareRuleEngine {
     private static final int SHOCK_MEDIUM_MAX = 10;
 
     // 온도 쾌적 구간 (°C)
-    private static final BigDecimal TEMP_IDEAL_MIN = BigDecimal.valueOf(15);
-    private static final BigDecimal TEMP_IDEAL_MAX = BigDecimal.valueOf(28);
+    private static final BigDecimal TEMP_RISK_MIN = BigDecimal.valueOf(15);
+    private static final BigDecimal TEMP_IDEAL_MIN = BigDecimal.valueOf(18);
+    private static final BigDecimal TEMP_IDEAL_MAX = BigDecimal.valueOf(22);
+    private static final BigDecimal TEMP_RISK_MAX = BigDecimal.valueOf(25);
 
     // 7일 건조 노출 비율 구간
     private static final double DRY_SHORT_MAX = 0.2;
@@ -85,6 +88,8 @@ public class CareRuleEngine {
         if (avgHumidity == null) {
             return HumidityGrade.UNKNOWN;
         }
+        // 앱 상태 칸과 같은 값으로 판정되도록 반올림한 정수로 비교한다.
+        avgHumidity = rounded(avgHumidity);
         if (avgHumidity.compareTo(DRY_RISK_MAX) < 0) {
             return HumidityGrade.DRY_RISK;
         }
@@ -131,13 +136,34 @@ public class CareRuleEngine {
         if (avgTemperature == null) {
             return "측정된 데이터가 없습니다";
         }
-        if (avgTemperature.compareTo(TEMP_IDEAL_MIN) < 0) {
+        BigDecimal value = rounded(avgTemperature);
+        if (value.compareTo(TEMP_IDEAL_MIN) < 0) {
             return "다소 낮은 환경";
         }
-        if (avgTemperature.compareTo(TEMP_IDEAL_MAX) > 0) {
+        if (value.compareTo(TEMP_IDEAL_MAX) > 0) {
             return "다소 높은 환경";
         }
         return "이상적입니다";
+    }
+
+    public String temperatureStress(BigDecimal avgTemperature) {
+        BigDecimal value = rounded(avgTemperature);
+        if (value.compareTo(TEMP_RISK_MIN) < 0 || value.compareTo(TEMP_RISK_MAX) > 0) {
+            return "ELEVATED";
+        }
+        return value.compareTo(TEMP_IDEAL_MIN) < 0 || value.compareTo(TEMP_IDEAL_MAX) > 0 ? "CAUTION" : "LOW";
+    }
+
+    public boolean isBelowIdealHumidity(BigDecimal avgHumidity) {
+        return rounded(avgHumidity).compareTo(IDEAL_MIN) < 0;
+    }
+
+    public boolean isAboveIdealTemperature(BigDecimal avgTemperature) {
+        return rounded(avgTemperature).compareTo(TEMP_IDEAL_MAX) > 0;
+    }
+
+    private static BigDecimal rounded(BigDecimal value) {
+        return value.setScale(0, RoundingMode.HALF_UP);
     }
 
     /** 최근 7일 건조 노출 정성 등급. */

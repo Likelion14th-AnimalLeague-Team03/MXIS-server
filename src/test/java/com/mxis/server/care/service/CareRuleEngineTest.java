@@ -20,17 +20,33 @@ class CareRuleEngineTest {
     @ParameterizedTest
     @CsvSource({
             "25.0, DRY_RISK",
-            "29.9, DRY_RISK",
-            "30.0, SLIGHTLY_DRY",
-            "39.9, SLIGHTLY_DRY",
-            "40.0, IDEAL",
-            "60.0, IDEAL",
-            "60.1, SLIGHTLY_HUMID",
-            "70.0, SLIGHTLY_HUMID",
-            "70.1, HUMID_RISK"
+            "29.4, DRY_RISK",
+            "29.5, SLIGHTLY_DRY",
+            "44.4, SLIGHTLY_DRY",
+            "44.5, IDEAL",
+            "55.4, IDEAL",
+            "55.5, SLIGHTLY_HUMID",
+            "65.4, SLIGHTLY_HUMID",
+            "65.5, HUMID_RISK"
     })
     void humidityGrade_boundaries(String humidity, HumidityGrade expected) {
         assertThat(engine.humidityGrade(new BigDecimal(humidity))).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "14.4, 다소 낮은 환경, ELEVATED",
+            "14.5, 다소 낮은 환경, CAUTION",
+            "17.4, 다소 낮은 환경, CAUTION",
+            "17.5, 이상적입니다, LOW",
+            "22.4, 이상적입니다, LOW",
+            "22.5, 다소 높은 환경, CAUTION",
+            "25.4, 다소 높은 환경, CAUTION",
+            "25.5, 다소 높은 환경, ELEVATED"
+    })
+    void temperature_boundariesMatchAppLevels(String temperature, String label, String stress) {
+        assertThat(engine.temperatureLabel(new BigDecimal(temperature))).isEqualTo(label);
+        assertThat(engine.temperatureStress(new BigDecimal(temperature))).isEqualTo(stress);
     }
 
     @ParameterizedTest

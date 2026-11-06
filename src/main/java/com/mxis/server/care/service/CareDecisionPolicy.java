@@ -64,9 +64,9 @@ public class CareDecisionPolicy {
             case HIGH -> "ELEVATED";
         };
         String temperature = !sufficient ? "UNKNOWN"
-                : stats.avgTemperature() < 15 || stats.avgTemperature() > 28 ? "CAUTION" : "LOW";
+                : rules.temperatureStress(BigDecimal.valueOf(stats.avgTemperature()));
         // An adverse temperature must never produce an Excellent fallback condition.
-        if (sufficient && ("CAUTION".equals(temperature) || stats.dryRatio() >= 0.2) && grade == CareConditionGrade.STABLE) {
+        if (sufficient && (!"LOW".equals(temperature) || stats.dryRatio() >= 0.2) && grade == CareConditionGrade.STABLE) {
             grade = CareConditionGrade.BALANCED;
         }
         String factor = !sufficient ? null : !"LOW".equals(humidity) ? "humidity"
